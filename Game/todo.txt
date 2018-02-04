@@ -1,0 +1,6 @@
+0. Debug renderer - complete
+1. Basic AABB collision
+2. Block textures, per side
+3. Texture stitching, (frame buffers)
+4. Netty implementation (just the basics), proxy with IProxy, CommonProxy, ClientProxy, ServerProxy
+5. Chunk Renderer with Dynamic draw(make vaos from the chunks and render them to reduce calculations on render time)
