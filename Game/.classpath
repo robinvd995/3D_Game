@@ -10,7 +10,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/jars/slick-util.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ObjConverterAPI"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NoiseGenerator"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

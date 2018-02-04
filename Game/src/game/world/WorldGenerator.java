@@ -3,7 +3,6 @@ package game.world;
 import java.util.Random;
 
 import game.block.Block;
-import noisegen.NoiseGenerator;
 
 public class WorldGenerator {
 
