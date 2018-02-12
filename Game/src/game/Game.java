@@ -42,8 +42,8 @@ public class Game {
 		camera = new Camera();
 		
 		WorldGenerator worldGen = new WorldGenerator();
-		//world = new ClientWorld(worldGen.generateWorld(64, 64, 0, 10, 5));
-		world = new ClientWorld(worldGen.generateFlatWorld(32, 32));
+		world = new ClientWorld(worldGen.generateWorld(64, 64, 0, 10, 5));
+		//world = new ClientWorld(worldGen.generateFlatWorld(32, 32));
 		world.checkBlocksToRender();
 		
 		timer = new Timer(GAME_FPS);

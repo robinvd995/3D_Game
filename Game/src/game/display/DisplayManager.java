@@ -136,7 +136,7 @@ public class DisplayManager {
 		calculateProjectionMatrix();
 	}
 	
-	private void initViewport(){
+	public void initViewport(){
 		GL11.glViewport(0, 0, windowSize.displayWidth, windowSize.displayHeight);
 	}
 	

@@ -147,26 +147,6 @@ public class OIMModelLoader {
 			}
 		}
 	}
-	
-	/*private static void readSize(XMLStreamReader reader, IndexedModel model) throws XMLStreamException {
-		while(reader.hasNext()){
-			int type = reader.next();
-			switch(type){
-			case XMLStreamReader.START_ELEMENT:
-				String elementName = reader.getLocalName();
-				if(elementName.equals("vertices")){
-					model.setVertexCount(readInt(reader));
-				}
-				if(elementName.equals("indices")){
-					model.setIndicesCount(readInt(reader));
-				}
-				break;
-				
-			case XMLStreamReader.END_ELEMENT:
-				return;
-			}
-		}
-	}*/
 
 	private static String readCharacters(XMLStreamReader reader) throws XMLStreamException {
         StringBuilder result = new StringBuilder();

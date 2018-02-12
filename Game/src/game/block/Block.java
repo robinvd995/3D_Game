@@ -8,19 +8,25 @@ import game.world.World;
 
 public class Block {
 
-	public static final Block AIR = new BlockAir(0);
-	public static final Block GRASS = new Block(1).setBlockColor(0.0f, 1.0f, 0.0f);
-	public static final Block WATER = new Block(2).setBlockColor(0.0f, 0.0f, 1.0f);
-	public static final Block STONE = new Block(3).setBlockColor(0.5f, 0.5f, 0.5f);
+	public static final int BLOCK_AMOUNT = 4;
+	
+	private static final Block[] BLOCKS = new Block[BLOCK_AMOUNT];
+	
+	public static final Block AIR = new BlockAir(0).setUnlocalizedName("air");
+	public static final Block GRASS = new Block(1).setUnlocalizedName("grass").setBlockColor(0.0f, 1.0f, 0.0f);
+	public static final Block WATER = new Block(2).setUnlocalizedName("water").setBlockColor(0.0f, 0.0f, 1.0f);
+	public static final Block STONE = new Block(3).setUnlocalizedName("stone").setBlockColor(0.5f, 0.5f, 0.5f);
 	
 	private Vector3f blockColor = new Vector3f(1.0f, 1.0f, 1.0f);
 	
 	private boolean needsRendering = true;
 	
 	private final int blockId;
+	private String unlocalizedName;
 	
 	public Block(int id){
 		blockId = id;
+		BLOCKS[id] = this;
 	}
 	
 	public Block setBlockColor(float r, float g, float b){
@@ -28,7 +34,7 @@ public class Block {
 		return this;
 	}
 	
-	public Vector3f getBlockColor(){
+	public Vector3f getBlockColor(World world, BlockPos pos){
 		return blockColor;
 	}
 	
@@ -42,10 +48,7 @@ public class Block {
 			return false;
 		}
 		for(EnumDirection dir : EnumDirection.getValidDirections()){
-			Block block = world.getBlock(pos.move(dir));
-			if(block.getBlockId() == 0){
-				return true;
-			}
+			if(shouldRenderSide(world, pos, dir)) return true;
 		}
 		return false;
 	}
@@ -64,5 +67,23 @@ public class Block {
 		int result = 1;
 		result = prime * result + blockId;
 		return result;
+	}
+	
+	public static Block getBlockFromId(int id){
+		return id < BLOCKS.length ? BLOCKS[id] : AIR;
+	}
+	
+	public String getUnlocalizedName(){
+		return unlocalizedName;
+	}
+	
+	public Block setUnlocalizedName(String unlocalizedName){
+		this.unlocalizedName = unlocalizedName;
+		return this;
+	}
+	
+	public boolean shouldRenderSide(World world, BlockPos pos, EnumDirection side){
+		Block block = world.getBlock(pos.move(side.opposite()));
+		return !block.needsRendering;
 	}
 }

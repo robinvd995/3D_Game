@@ -11,9 +11,9 @@ public class World {
 	private Block[][][] blocks;
 	
 	public World(int w, int h){
-		blocks = new Block[w][64][h];
+		blocks = new Block[w][16][h];
 		player = new Player(this);
-		player.getTransform().getPosition().set(0, 20, 0);
+		player.getTransform().getPosition().set(1, 10, 1);
 		//player.getTransform().setScale(1.0f, 2.0f, 1.0f);
 		player.init();
 	}

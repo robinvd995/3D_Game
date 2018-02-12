@@ -2,12 +2,13 @@ package game.util;
 
 public enum EnumDirection {
 
-	UP(0, 1, 0),
-	DOWN(0, -1, 0),
-	LEFT(-1, 0, 0),
-	RIGHT(1, 0, 0),
-	FRONT(0, 0, -1),
-	BACK(0, 0, 1);
+	NONE(-1, 0, 0, 0, "undefined"), 
+	UP(0, 0, 1, 0, "up"),
+	DOWN(1, 0, -1, 0, "down"),
+	LEFT(2, -1, 0, 0, "left"),
+	RIGHT(3, 1, 0, 0, "right"),
+	FRONT(4, 0, 0, -1, "front"),
+	BACK(5, 0, 0, 1, "back");
 	
 	private static final EnumDirection[] VALID_DIRECTIONS = new EnumDirection[6];
 	private static final EnumDirection[] HORIZONTAL_DIRECTIONS = new EnumDirection[4];
@@ -26,14 +27,18 @@ public enum EnumDirection {
 		HORIZONTAL_DIRECTIONS[3] = BACK;
 	}
 	
-	private int offX;
-	private int offY;
-	private int offZ;
+	private final int directionId;
+	private final int offX;
+	private final int offY;
+	private final int offZ;
+	private final String unlocalizedName;
 	
-	private EnumDirection(int offX, int offY, int offZ){
+	private EnumDirection(int dirId, int offX, int offY, int offZ, String name){
+		this.directionId = dirId;
 		this.offX = offX;
 		this.offY = offY;
 		this.offZ = offZ;
+		this.unlocalizedName = name;
 	}
 	
 	public int getOffsetX(){
@@ -46,6 +51,10 @@ public enum EnumDirection {
 	
 	public int getOffsetZ(){
 		return offZ;
+	}
+	
+	public int getDirectionId(){
+		return directionId;
 	}
 	
 	public static EnumDirection[] getValidDirections(){
@@ -64,7 +73,15 @@ public enum EnumDirection {
 		case RIGHT: return LEFT;
 		case FRONT: return BACK;
 		case BACK: return FRONT;
+		default: return NONE;
 		}
-		return null;
+	}
+	
+	public static EnumDirection getDirectionFromId(int directionId){
+		return directionId >= 0 && directionId < 6 ? VALID_DIRECTIONS[directionId] : NONE;
+	}
+	
+	public String getUnlocalizedName(){
+		return unlocalizedName;
 	}
 }

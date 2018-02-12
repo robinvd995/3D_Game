@@ -146,4 +146,11 @@ public class Vector3f extends Vector2f{
 		set(newX, newY, newZ);
 		return this;
 	}
+	
+	public float distanceTo(Vector3f other){
+		float dx = getX() - other.getX();
+		float dy = getY() - other.getY();
+		float dz = getZ() - other.getZ();
+		return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
+	}
 }

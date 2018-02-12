@@ -13,15 +13,18 @@ import org.lwjgl.opengl.GL;
 
 import caesar.util.Matrix4f;
 import caesar.util.Vector3f;
-import game.block.Block;
+import game.renderer.block.BlockRenderManager;
+import game.renderer.block.BlockRenderRegistry;
+import game.renderer.entity.EntityRenderManager;
 import game.renderer.model.ModelLoader;
+import game.renderer.texture.TextureManager;
 import game.world.ClientWorld;
 
 public class RenderManager {
 
 	private BlockRenderManager blockRenderer;
 	private EntityRenderManager entityRenderer;
-
+	
 	public RenderManager(){
 		blockRenderer = new BlockRenderManager();
 		entityRenderer = new EntityRenderManager();
@@ -33,9 +36,17 @@ public class RenderManager {
 	}
 	
 	public void initRenderer(){
+		BlockRenderRegistry.loadAllRenderData();
+		TextureManager.loadAllTextures();
+		
 		entityRenderer.initRenderer();
+		blockRenderer.initRenderer();
 	}
 
+	private void stitchTextures(){
+		
+	}
+	
 	private void prepare(){
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -44,13 +55,12 @@ public class RenderManager {
 	}
 
 	public void renderWorld(Camera camera, ClientWorld world, double delta, Vector3f lightDir){
+		//buffer.bindTextureBuffer();
 		prepare();
 		Matrix4f viewMatrix = camera.createViewMatrix();
 		
 		blockRenderer.prepare(lightDir, viewMatrix);
-		for(Block block : world.getBlocksToRender()){
-			blockRenderer.renderBlocks(world.getWorldObj(), block, world.getPositionsForBockToRender(block));
-		}
+		blockRenderer.renderBlocks(world);
 		blockRenderer.end();
 		
 		entityRenderer.prepare(lightDir, viewMatrix);
@@ -63,6 +73,13 @@ public class RenderManager {
 	}
 
 	public void cleanUp() {
+		/*try {
+			//TextureLoader.saveBufferColorTexture(buffer, TextureStitcher.TEXTURE_DIMENSIONS, TextureStitcher.TEXTURE_DIMENSIONS, "buffer", "png");
+			//TextureLoader.saveBufferColorTexture(buffer, DisplayManager.INSTANCE.getDisplayWidth(), DisplayManager.INSTANCE.getDisplayHeight(), "buffer", "png");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
+		System.out.println("cleanup");
 		ModelLoader.INSTANCE.cleanUp();
 	}
 }

@@ -2,14 +2,18 @@ package game.world;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import game.block.Block;
+import game.renderer.block.BlockRenderData;
+import game.renderer.block.BlockRenderRegistry;
 import game.util.BlockPos;
 
 public class ClientWorld {
 
+	private HashMap<String,Set<Block>> modelsToRender;
 	private HashMap<Block,List<BlockPos>> blocksToRender;
 	
 	private final World world;
@@ -17,10 +21,12 @@ public class ClientWorld {
 	public ClientWorld(World world) {
 		this.world = world;
 		blocksToRender = new HashMap<Block,List<BlockPos>>();
+		modelsToRender = new HashMap<String,Set<Block>>();
 	}
 	
 	public void checkBlocksToRender(){
 		blocksToRender.clear();
+		modelsToRender.clear();
 		
 		int maxX = world.getMaxX();
 		int maxY = world.getMaxY();
@@ -40,6 +46,14 @@ public class ClientWorld {
 	}
 	
 	private void addBlockToRender(Block block, BlockPos pos){
+		BlockRenderData brd = BlockRenderRegistry.getBlockRenderData(block);
+		if(brd == null) return;
+		String model = brd.getModel();
+		if(!modelsToRender.containsKey(model)){
+			modelsToRender.put(model, new HashSet<Block>());
+		}
+		modelsToRender.get(model).add(block);
+		
 		if(!blocksToRender.containsKey(block)){
 			blocksToRender.put(block, new ArrayList<BlockPos>());
 		}
@@ -50,11 +64,15 @@ public class ClientWorld {
 		return world;
 	}
 	
-	public Set<Block> getBlocksToRender(){
-		return blocksToRender.keySet();
+	public Set<String> getModelsToRender(){
+		return modelsToRender.keySet();
 	}
 	
 	public List<BlockPos> getPositionsForBockToRender(Block block){
 		return blocksToRender.get(block);
+	}
+
+	public Set<Block> getBlocksToRender(String model) {
+		return modelsToRender.get(model);
 	}
 }

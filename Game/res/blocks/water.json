@@ -1,0 +1,11 @@
+{
+	"model": "cube",
+	"parts":{
+		"up":{ "texture":"grass_top" },
+		"down":{ "texture":"grass_top" },
+		"left":{ "texture":"grass_side" },
+		"right":{ "texture":"grass_side" },
+		"front":{ "texture":"grass_side" },
+		"back":{ "texture":"grass_side" }
+	}
+}

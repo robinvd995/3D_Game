@@ -71,24 +71,48 @@ public class AxisAlignedBB {
 		return minX;
 	}
 
+	public float getMinX(Vector3f pos) {
+		return minX + pos.getX();
+	}
+	
 	public float getMinY() {
 		return minY;
+	}
+	
+	public float getMinY(Vector3f pos){
+		return minY + pos.getY();
 	}
 
 	public float getMinZ() {
 		return minZ;
+	}
+	
+	public float getMinZ(Vector3f pos){
+		return minZ + pos.getZ();
 	}
 
 	public float getMaxX() {
 		return maxX;
 	}
 
+	public float getMaxX(Vector3f pos){
+		return maxX + pos.getX();
+	}
+	
 	public float getMaxY() {
 		return maxY;
 	}
 
+	public float getMaxY(Vector3f pos){
+		return maxY + pos.getY();
+	}
+	
 	public float getMaxZ() {
 		return maxZ;
+	}
+	
+	public float getMaxZ(Vector3f pos){
+		return maxZ + pos.getZ();
 	}
 
 	public float getWidth(){

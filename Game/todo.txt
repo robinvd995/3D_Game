@@ -1,5 +1,5 @@
 0. Debug renderer - complete
-1. Basic AABB collision
+1. Basic AABB collision - Alomst done, some issues are still present
 2. Block textures, per side
 3. Texture stitching, (frame buffers)
 4. Netty implementation (just the basics), proxy with IProxy, CommonProxy, ClientProxy, ServerProxy
