@@ -1,6 +1,2 @@
-0. Debug renderer - complete
-1. Basic AABB collision - Alomst done, some issues are still present
-2. Block textures, per side
-3. Texture stitching, (frame buffers)
-4. Netty implementation (just the basics), proxy with IProxy, CommonProxy, ClientProxy, ServerProxy
-5. Chunk Renderer with Dynamic draw(make vaos from the chunks and render them to reduce calculations on render time)
+CHANGE SHADERS!!!! VERY ANNYONING AND STATIC AT THE MOMENT! SHADERS NEED TO AUTO DETECT UNIFORMS AND ATTRIBUTE LOCATIONS!
+1. Netty implementation (just the basics), proxy with IProxy, CommonProxy, ClientProxy, ServerProxy

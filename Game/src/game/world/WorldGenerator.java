@@ -9,7 +9,7 @@ public class WorldGenerator {
 	public World generateWorld(int width, int height, int minHeight, int maxHeight, int waterLevel){
 		Random rand = new Random();
 		int amplitude = maxHeight - minHeight;
-		float[][] perlinNoise = NoiseGenerator.generatePerlinNoise(rand, width, height, 4);
+		float[][] perlinNoise = NoiseGenerator.generatePerlinNoise(rand, width, height, 5);
 
 		World world = new World(width, height);
 
@@ -20,7 +20,12 @@ public class WorldGenerator {
 				for(int y = 0; y < world.getMaxY(); y++){
 					Block blockToSet = Block.AIR;
 					if(y == blockPosY){
-						blockToSet = Block.GRASS;
+						if(y <= waterLevel){
+							blockToSet = Block.SAND;
+						}
+						else{
+							blockToSet = Block.GRASS;
+						}
 					}
 					else if(y > blockPosY && y <= waterLevel){
 						blockToSet = Block.WATER;
@@ -50,7 +55,7 @@ public class WorldGenerator {
 				}
 			}
 		}
-		
+
 		return world;
 	}
 }

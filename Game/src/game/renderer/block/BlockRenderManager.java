@@ -9,6 +9,7 @@ import game.block.Block;
 import game.display.DisplayManager;
 import game.renderer.model.LoadedModel;
 import game.renderer.shader.BlockShader;
+import game.renderer.texture.TextureManager;
 import game.util.BlockPos;
 import game.world.ClientWorld;
 
@@ -31,11 +32,12 @@ public class BlockRenderManager {
 		shader.loadViewMatrix(viewMatrix);
 		shader.loadProjectionMatrix(projectionMatrix);
 		shader.loadLightDirection(lightDir);
+		TextureManager.bindBlockTextureMap();
 	}
 
-	public void renderBlocks(ClientWorld world){
+	public void renderBlocks(ClientWorld world, boolean renderTransparentBlocks){
 		
-		for(String modelName : world.getModelsToRender()){
+		for(String modelName : world.getModelsToRender(renderTransparentBlocks)){
 			LoadedModel model = BlockRenderRegistry.getModel(modelName);
 			
 			int vao = model.getVao();
@@ -45,11 +47,12 @@ public class BlockRenderManager {
 			GL20.glEnableVertexAttribArray(1);
 			GL20.glEnableVertexAttribArray(2);
 			
-			for(Block block : world.getBlocksToRender(modelName)){
+			for(Block block : world.getBlocksToRender(modelName, renderTransparentBlocks)){
 				BlockRenderer renderer = BlockRenderRegistry.getBlockRenderer(block);
+				BlockRenderData brd = BlockRenderRegistry.getBlockRenderData(block);
 				renderer.preRenderBlock(shader, world.getWorldObj(), block);
-				for(BlockPos pos : world.getPositionsForBockToRender(block)){
-					renderer.renderBlock(shader, world.getWorldObj(), pos, block, model);
+				for(BlockPos pos : world.getPositionsForBockToRender(block, renderTransparentBlocks)){
+					renderer.renderBlock(shader, world.getWorldObj(), pos, block, model, brd);
 				}
 				renderer.postRenderBlock(shader, world.getWorldObj(), block);
 			}

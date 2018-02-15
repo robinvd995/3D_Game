@@ -11,11 +11,10 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import caesar.util.Vector3f;
 import converter.api.model.IndexedModel;
 import converter.api.model.IndexedVertex;
 import converter.api.model.ModelSection;
-import game.physics.AxisAlignedBB;
+import game.renderer.gui.Gui.GuiQuad;
 
 public class ModelLoader {
 
@@ -73,6 +72,23 @@ public class ModelLoader {
 		return loadedModel;
 	}
 
+	public GuiQuad loadGuiComponentQuad(float[] vertices, float[] uvs, int[] indices){
+		int vao = createVAO();
+		GuiQuad quad = new GuiQuad(vao);
+		quad.addVbo(bindIndicesBuffer(indices));
+		quad.addVbo(storeDataInAttribList(0, 2, vertices));
+		quad.addVbo(storeDataInAttribList(1, 2, uvs));
+		unbindVAO();
+		return quad;
+	}
+	
+	public SimpleModel loadSimpleCube(float[] vertices){
+		int vao = createVAO();
+		SimpleModel model = new SimpleModel(vao);
+		model.addVbo(storeDataInAttribList(0, 3, vertices));
+		return model;
+	}
+	
 	/*public LoadedModel loadAxisAlignedBBAsModel(AxisAlignedBB aabb){
 		
 		int vao = createVAO();
@@ -120,6 +136,16 @@ public class ModelLoader {
 		return id;
 	}
 
+	private int storeDataInAttribList(int attributeNumer, int coordinteSize, float[] data){
+		int vboID = GL15.glGenBuffers();
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
+		FloatBuffer buffer = storeDataInFloatBuffer(data);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+		GL20.glVertexAttribPointer(attributeNumer, coordinteSize, GL11.GL_FLOAT, false, 0, 0);
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		return vboID;
+	}
+	
 	private void storeDataInAttribList(LoadedModel model, int attributeNumer, int coordinteSize, float[] data){
 		int vboID = GL15.glGenBuffers();
 		model.addVbo(vboID);
@@ -134,6 +160,14 @@ public class ModelLoader {
 		GL30.glBindVertexArray(0);
 	}
 
+	private int bindIndicesBuffer(int[] indices){
+		int vbo = GL15.glGenBuffers();
+		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
+		IntBuffer buffer = storeDataInIntBuffer(indices);
+		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
+		return vbo;
+	}
+	
 	private void bindIndicesBuffer(LoadedModel model, int[] indices){
 		int vboID = GL15.glGenBuffers();
 		model.addVbo(vboID);

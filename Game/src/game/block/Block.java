@@ -8,14 +8,15 @@ import game.world.World;
 
 public class Block {
 
-	public static final int BLOCK_AMOUNT = 4;
+	public static final int BLOCK_AMOUNT = 5;
 	
 	private static final Block[] BLOCKS = new Block[BLOCK_AMOUNT];
 	
 	public static final Block AIR = new BlockAir(0).setUnlocalizedName("air");
-	public static final Block GRASS = new Block(1).setUnlocalizedName("grass").setBlockColor(0.0f, 1.0f, 0.0f);
-	public static final Block WATER = new Block(2).setUnlocalizedName("water").setBlockColor(0.0f, 0.0f, 1.0f);
-	public static final Block STONE = new Block(3).setUnlocalizedName("stone").setBlockColor(0.5f, 0.5f, 0.5f);
+	public static final Block GRASS = new Block(1).setUnlocalizedName("grass");
+	public static final Block WATER = new BlockWater(2).setUnlocalizedName("water");
+	public static final Block STONE = new Block(3).setUnlocalizedName("stone");
+	public static final Block SAND = new Block(4).setUnlocalizedName("sand");
 	
 	private Vector3f blockColor = new Vector3f(1.0f, 1.0f, 1.0f);
 	
@@ -61,6 +62,14 @@ public class Block {
 		return new AxisAlignedBB(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 	}
 	
+	public boolean isFullCube(){
+		return true;
+	}
+	
+	public boolean isTransparantBlock(){
+		return false;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -83,7 +92,7 @@ public class Block {
 	}
 	
 	public boolean shouldRenderSide(World world, BlockPos pos, EnumDirection side){
-		Block block = world.getBlock(pos.move(side.opposite()));
-		return !block.needsRendering;
+		Block block = world.getBlock(pos.move(side));
+		return !block.isFullCube() || block.isTransparantBlock();
 	}
 }

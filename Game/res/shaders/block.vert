@@ -15,12 +15,13 @@ uniform mat4 projectionMatrix;
 
 uniform vec3 blockColor;
 uniform vec3 lightDirection;
+uniform vec4 textureCoords;
 
 void main(void){
 
 	vec4 worldPos = modelMatrix * vec4(vertexPosition, 1.0);
 	gl_Position = projectionMatrix * viewMatrix * worldPos;
-	uvPosition = vertexUV;
+	uvPosition = vec2(textureCoords.x, textureCoords.y) + (vertexUV * vec2(textureCoords.z, textureCoords.w));
 
 	in_block_color = blockColor;
 

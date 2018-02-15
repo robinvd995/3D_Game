@@ -1,11 +1,11 @@
 {
 	"model": "cube",
 	"parts":{
-		"up":{ "texture":"grass_top" },
-		"down":{ "texture":"grass_top" },
-		"left":{ "texture":"grass_side" },
-		"right":{ "texture":"grass_side" },
-		"front":{ "texture":"grass_side" },
-		"back":{ "texture":"grass_side" }
+		"up":{ "texture":"water" },
+		"down":{ "texture":"water" },
+		"left":{ "texture":"water" },
+		"right":{ "texture":"water" },
+		"front":{ "texture":"water" },
+		"back":{ "texture":"water" }
 	}
 }

@@ -2,6 +2,7 @@ package game.renderer.shader;
 
 import caesar.util.Matrix4f;
 import caesar.util.Vector3f;
+import caesar.util.Vector4f;
 
 public class BlockShader extends ShaderProgram {
 
@@ -13,6 +14,7 @@ public class BlockShader extends ShaderProgram {
 	private int location_projectionMatrix;
 	private int location_blockColor;
 	private int location_lightDirection;
+	private int location_textureCoords;
 	
 	public BlockShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -32,6 +34,7 @@ public class BlockShader extends ShaderProgram {
 		location_projectionMatrix = super.getUniformLocation("projectionMatrix");
 		location_blockColor = super.getUniformLocation("blockColor");
 		location_lightDirection = super.getUniformLocation("lightDirection");
+		location_textureCoords = super.getUniformLocation("textureCoords");
 	}
 	
 	public void loadModelMatrix(Matrix4f modelMatrix){
@@ -58,5 +61,9 @@ public class BlockShader extends ShaderProgram {
 	
 	public void loadLightDirection(Vector3f dir){
 		super.loadVector3f(location_lightDirection, dir);
+	}
+	
+	public void loadTextureCoords(Vector4f coords){
+		super.load4DVector(location_textureCoords, coords);
 	}
 }

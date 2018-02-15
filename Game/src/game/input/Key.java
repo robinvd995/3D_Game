@@ -18,9 +18,12 @@ public class Key {
 	public static final Key A = new Key("A", GLFW.GLFW_KEY_A);
 	public static final Key D = new Key("D", GLFW.GLFW_KEY_D);
 	
+	public static final Key ESC = new Key("Escape", GLFW.GLFW_KEY_ESCAPE);
 	public static final Key SPACE = new Key("Space", GLFW.GLFW_KEY_SPACE);
 	public static final Key LEFT_SHIFT = new Key("Left_Shift", GLFW.GLFW_KEY_LEFT_SHIFT);
 	public static final Key LEFT_CTRL = new Key("Left_Ctrl", GLFW.GLFW_KEY_LEFT_CONTROL);
+	
+	public static final Key F12 = new Key("Screenshot", GLFW.GLFW_KEY_F12);
 	
 	private final String name;
 	private int keyCode;

@@ -1,6 +1,11 @@
 {
 	"model": "cube",
 	"parts":{
-		"undefined":{ "texture":"stone" }
+		"up":{ "texture":"stone" },
+		"down":{ "texture":"stone" },
+		"left":{ "texture":"stone" },
+		"right":{ "texture":"stone" },
+		"front":{ "texture":"stone" },
+		"back":{ "texture":"stone" }
 	}
 }

@@ -10,6 +10,7 @@ import game.display.DisplayManager;
 import game.input.InputManager;
 import game.renderer.Camera;
 import game.renderer.RenderManager;
+import game.renderer.gui.Gui;
 import game.world.ClientWorld;
 import game.world.WorldGenerator;
 
@@ -56,15 +57,17 @@ public class Game {
 		glfwPollEvents();
 		
 		if(timer.update()){
-			camera.update(timer.getTickTime());
 			/*double newLightX = lightDirection.getX() + (20.0f * timer.getDeltaTime());
 			if(newLightX > 180.0f){
 				newLightX -= 360.0f;
 			}
 			lightDirection.setX((float) newLightX);*/
-			world.getWorldObj().update(timer.getTickTime());
-			InputManager.end();
+			
 		}
+		
+		camera.update(timer.getDeltaTime());
+		world.getWorldObj().update(timer.getDeltaTime());
+		InputManager.end();
 		
 		renderer.renderWorld(camera, world, timer.getDeltaTime(), lightDirection);
 	}
@@ -75,5 +78,10 @@ public class Game {
 	
 	protected void close(){
 		renderer.cleanUp();
+	}
+	
+	public void openGui(Gui gui){
+		gui.init(DisplayManager.INSTANCE.getDisplayWidth(), DisplayManager.INSTANCE.getDisplayHeight());
+		renderer.getGuiRenderer().addGui(gui);
 	}
 }

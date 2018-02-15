@@ -22,6 +22,9 @@ import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -53,6 +56,10 @@ public class DisplayManager {
 	private long window;
 	
 	private Matrix4f projectionMatrix;
+	
+	private List<IDisplaySizeListener> displaySizeListeners = new ArrayList<IDisplaySizeListener>();
+	
+	private boolean isCursorDisabled = false;
 	
 	public void initDisplay(final String displayText){
 		
@@ -96,6 +103,8 @@ public class DisplayManager {
 		GL.createCapabilities();
 		
 		initViewport();
+		
+		toggleCursor();
 	}
 	
 	public void swapBuffer(){
@@ -122,6 +131,9 @@ public class DisplayManager {
 		glfwSetWindowSize(window, windowSize.displayWidth, windowSize.displayHeight);
 		initWindowResolution();
 		initViewport();
+		for(IDisplaySizeListener listener : displaySizeListeners){
+			listener.onDisplaySizeChanged(INSTANCE);
+		}
 	}
 	
 	private void initWindowResolution(){
@@ -200,5 +212,23 @@ public class DisplayManager {
 	
 	public void setMousePosition(Vector2f position){
 		GLFW.glfwSetCursorPos(window, position.getX(), position.getY());
+	}
+	
+	public void addDisplaySizeListener(IDisplaySizeListener listener){
+		displaySizeListeners.add(listener);
+	}
+	
+	public void toggleCursor(){
+		if(isCursorDisabled){
+			GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+		}
+		else{
+			GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+		}
+		isCursorDisabled = !isCursorDisabled;
+	}
+	
+	public boolean isCursorsDisabled(){
+		return isCursorDisabled;
 	}
 }

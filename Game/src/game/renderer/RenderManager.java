@@ -7,27 +7,37 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glCullFace;
+import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
 
 import caesar.util.Matrix4f;
 import caesar.util.Vector3f;
+import game.Game;
 import game.renderer.block.BlockRenderManager;
 import game.renderer.block.BlockRenderRegistry;
 import game.renderer.entity.EntityRenderManager;
+import game.renderer.gui.GuiRenderManager;
+import game.renderer.gui.TestGui;
 import game.renderer.model.ModelLoader;
 import game.renderer.texture.TextureManager;
+import game.renderer.world.SkyboxRenderManager;
 import game.world.ClientWorld;
 
 public class RenderManager {
 
 	private BlockRenderManager blockRenderer;
 	private EntityRenderManager entityRenderer;
+	private GuiRenderManager guiRenderer;
+	private SkyboxRenderManager skyboxRenderer;
 	
 	public RenderManager(){
 		blockRenderer = new BlockRenderManager();
 		entityRenderer = new EntityRenderManager();
+		guiRenderer = new GuiRenderManager();
+		skyboxRenderer = new SkyboxRenderManager();
 		DebugRenderer.INSTANCE.init();
 	}
 
@@ -41,10 +51,11 @@ public class RenderManager {
 		
 		entityRenderer.initRenderer();
 		blockRenderer.initRenderer();
-	}
-
-	private void stitchTextures(){
+		guiRenderer.initRenderer();
+		skyboxRenderer.initRenderer();
 		
+		TestGui testGui = new TestGui();
+		Game.INSTANCE.openGui(testGui);
 	}
 	
 	private void prepare(){
@@ -59,8 +70,14 @@ public class RenderManager {
 		prepare();
 		Matrix4f viewMatrix = camera.createViewMatrix();
 		
+		skyboxRenderer.renderSkybox(viewMatrix);
+		
 		blockRenderer.prepare(lightDir, viewMatrix);
-		blockRenderer.renderBlocks(world);
+		blockRenderer.renderBlocks(world, false);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		blockRenderer.renderBlocks(world, true);
+		GL11.glDisable(GL11.GL_BLEND);
 		blockRenderer.end();
 		
 		entityRenderer.prepare(lightDir, viewMatrix);
@@ -70,6 +87,10 @@ public class RenderManager {
 		DebugRenderer.INSTANCE.prepare(viewMatrix);
 		DebugRenderer.INSTANCE.renderAll();
 		DebugRenderer.INSTANCE.end();
+		
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_DEPTH_TEST);
+		guiRenderer.renderGuis();
 	}
 
 	public void cleanUp() {
@@ -81,5 +102,9 @@ public class RenderManager {
 		}*/
 		System.out.println("cleanup");
 		ModelLoader.INSTANCE.cleanUp();
+	}
+	
+	public GuiRenderManager getGuiRenderer(){
+		return guiRenderer;
 	}
 }

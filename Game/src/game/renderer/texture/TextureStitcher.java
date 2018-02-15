@@ -32,7 +32,7 @@ public class TextureStitcher {
 				BufferedImage image = ImageIO.read(textureFile);
 				int width = image.getWidth();
 				int height = image.getHeight();
-				if(width != height || width % 16 != 0){
+				if(width != height || width % TEXTURE_SPOT_SIZE != 0){
 					System.err.println("Texture " + textureFilePath + " is not a valid texture!");
 					continue;
 				}

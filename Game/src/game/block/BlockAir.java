@@ -9,6 +9,10 @@ public class BlockAir extends Block{
 		this.disableRendering();
 	}
 
+	public boolean isFullCube(){
+		return false;
+	}
+	
 	@Override
 	public AxisAlignedBB getBoundingBox(){
 		return null;

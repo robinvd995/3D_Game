@@ -5,10 +5,10 @@ public enum EnumDirection {
 	NONE(-1, 0, 0, 0, "undefined"), 
 	UP(0, 0, 1, 0, "up"),
 	DOWN(1, 0, -1, 0, "down"),
-	LEFT(2, -1, 0, 0, "left"),
-	RIGHT(3, 1, 0, 0, "right"),
-	FRONT(4, 0, 0, -1, "front"),
-	BACK(5, 0, 0, 1, "back");
+	LEFT(2, 1, 0, 0, "left"),
+	RIGHT(3, -1, 0, 0, "right"),
+	FRONT(4, 0, 0, 1, "front"),
+	BACK(5, 0, 0, -1, "back");
 	
 	private static final EnumDirection[] VALID_DIRECTIONS = new EnumDirection[6];
 	private static final EnumDirection[] HORIZONTAL_DIRECTIONS = new EnumDirection[4];

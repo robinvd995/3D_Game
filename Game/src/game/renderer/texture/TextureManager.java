@@ -1,8 +1,13 @@
 package game.renderer.texture;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import game.block.Block;
 import game.renderer.block.BlockRenderData;
@@ -13,8 +18,11 @@ import game.util.EnumDirection;
 
 public class TextureManager {
 
-	private static int blockTextureMap;
-	
+	private static final String BLOCK_TEXTURE_MAP_KEY = "blockTextureMap";
+
+	private static final HashMap<String,LoadedTexture> TEXTURE_MAP = new HashMap<String,LoadedTexture>();
+	private static HashMap<String,MappedTexture> blockTextures;
+
 	public static void loadAllTextures(){
 		Set<String> textures = new HashSet<String>();
 		for(int i = 0; i < Block.BLOCK_AMOUNT; i++){
@@ -26,17 +34,54 @@ public class TextureManager {
 				textures.add(part.getTexture());
 			}
 		}
-		
+
 		System.out.println("Found " + textures.size() + "unique textures to map!");
 		StitchResult result = TextureStitcher.stitchTextures("res/textures/", "png", textures);
-		HashMap<String,MappedTexture> textureMap = result.getTextures();
-		for(String s : textureMap.keySet()){
-			MappedTexture mappedTexture = textureMap.get(s);
+
+		blockTextures = result.getTextures();
+		for(String s : blockTextures.keySet()){
+			MappedTexture mappedTexture = blockTextures.get(s);
 			System.out.println(s + ":" + mappedTexture.toVector());
 		}
+
+		LoadedTexture loadedTexture = TextureLoader.loadTexture(result.getImage());
+		TEXTURE_MAP.put(BLOCK_TEXTURE_MAP_KEY, loadedTexture);
+	}
+
+	public static MappedTexture getMappedBlockTexture(String texture){
+		return blockTextures.get(texture);
 	}
 	
-	public static int getBlockTextureMap(){
-		return blockTextureMap;
+	public static LoadedTexture getBlockTextureMap(){
+		return TEXTURE_MAP.get(BLOCK_TEXTURE_MAP_KEY);
+	}
+
+	public static void bindBlockTextureMap(){
+		bindTexture(BLOCK_TEXTURE_MAP_KEY);
+	}
+	
+	public static void bindTexture(String texture){
+		LoadedTexture loadedTexture = getTexture(texture);
+		TextureLoader.bindTexture(loadedTexture);
+	}
+	
+	private static LoadedTexture getTexture(String texture){
+		if(TEXTURE_MAP.containsKey(texture)){
+			return TEXTURE_MAP.get(texture);
+		}
+		else{
+			//LoadedTexture loadedTexture = loadTexture(texture);
+			File file = new File("res/textures/" + texture + ".png");
+			LoadedTexture loadedTexture = null;
+			try {
+				System.out.println(file.getAbsolutePath());
+				BufferedImage img = ImageIO.read(file);
+				loadedTexture = TextureLoader.loadTexture(img);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			TEXTURE_MAP.put(texture, loadedTexture);
+			return loadedTexture;
+		}
 	}
 }

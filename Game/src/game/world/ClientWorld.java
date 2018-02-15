@@ -16,12 +16,17 @@ public class ClientWorld {
 	private HashMap<String,Set<Block>> modelsToRender;
 	private HashMap<Block,List<BlockPos>> blocksToRender;
 	
+	private HashMap<String,Set<Block>> transparentModelsToRender;
+	private HashMap<Block,List<BlockPos>> transparentBlocksToRender;
+	
 	private final World world;
 	
 	public ClientWorld(World world) {
 		this.world = world;
 		blocksToRender = new HashMap<Block,List<BlockPos>>();
 		modelsToRender = new HashMap<String,Set<Block>>();
+		transparentModelsToRender = new HashMap<String,Set<Block>>();
+		transparentBlocksToRender = new HashMap<Block,List<BlockPos>>();
 	}
 	
 	public void checkBlocksToRender(){
@@ -38,41 +43,47 @@ public class ClientWorld {
 					BlockPos pos = new BlockPos(i, j, k);
 					Block block = world.getBlock(pos);
 					if(block.shouldBlockBeRendered(world, pos)){
-						addBlockToRender(block, pos);
+						if(block.isTransparantBlock()){
+							addBlockToRender(transparentModelsToRender, transparentBlocksToRender, block, pos);
+						}else{
+							addBlockToRender(modelsToRender, blocksToRender, block, pos);
+						}
 					}
 				}
 			}
 		}
+		
+		System.out.println(transparentBlocksToRender.containsKey(Block.WATER));
 	}
 	
-	private void addBlockToRender(Block block, BlockPos pos){
+	private void addBlockToRender(HashMap<String,Set<Block>> modelMap, HashMap<Block,List<BlockPos>> blockMap, Block block, BlockPos pos){
 		BlockRenderData brd = BlockRenderRegistry.getBlockRenderData(block);
 		if(brd == null) return;
 		String model = brd.getModel();
-		if(!modelsToRender.containsKey(model)){
-			modelsToRender.put(model, new HashSet<Block>());
+		if(!modelMap.containsKey(model)){
+			modelMap.put(model, new HashSet<Block>());
 		}
-		modelsToRender.get(model).add(block);
+		modelMap.get(model).add(block);
 		
-		if(!blocksToRender.containsKey(block)){
-			blocksToRender.put(block, new ArrayList<BlockPos>());
+		if(!blockMap.containsKey(block)){
+			blockMap.put(block, new ArrayList<BlockPos>());
 		}
-		blocksToRender.get(block).add(pos);
+		blockMap.get(block).add(pos);
 	}
 	
 	public World getWorldObj(){
 		return world;
 	}
 	
-	public Set<String> getModelsToRender(){
-		return modelsToRender.keySet();
+	public Set<String> getModelsToRender(boolean transparent){
+		return transparent ? transparentModelsToRender.keySet() : modelsToRender.keySet();
 	}
 	
-	public List<BlockPos> getPositionsForBockToRender(Block block){
-		return blocksToRender.get(block);
+	public List<BlockPos> getPositionsForBockToRender(Block block, boolean transparent){
+		return transparent ? transparentBlocksToRender.get(block) : blocksToRender.get(block);
 	}
 
-	public Set<Block> getBlocksToRender(String model) {
-		return modelsToRender.get(model);
+	public Set<Block> getBlocksToRender(String model, boolean transparent) {
+		return transparent ? transparentModelsToRender.get(model) : modelsToRender.get(model);
 	}
 }
