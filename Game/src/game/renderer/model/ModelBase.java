@@ -21,4 +21,8 @@ public abstract class ModelBase {
 	public final int getVao(){
 		return vao;
 	}
+	
+	public void delete(){
+		GL30.glDeleteVertexArrays(vao);
+	}
 }

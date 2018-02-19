@@ -36,11 +36,12 @@ public class SkyboxRenderManager {
 		viewMatrixCopy.m31 = 0.0f;
 		viewMatrixCopy.m32 = 0.0f;
 		shader.loadMatrix("viewMatrix", viewMatrixCopy);
-		skyboxCube.bind();
+		skyboxCube.bindModel();
 		shader.enableAttribArrays();
 		GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, skyboxTexture.getTextureID());
-		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 36);
+		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, skyboxCube.getSize());
 		shader.disableAttribArrays();
+		skyboxCube.unbindModel();
 		shader.stop();
 	}
 }

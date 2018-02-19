@@ -10,8 +10,8 @@ public class TextureFrameBuffer extends FrameBuffer{
 	private int colorTexture;
 	
 	private TextureFrameBuffer(int buffer) {
-		super(buffer);
-		this.colorTexture = createColorTexture(TextureStitcher.TEXTURE_DIMENSIONS, TextureStitcher.TEXTURE_DIMENSIONS);
+		super(buffer, TextureStitcher.TEXTURE_DIMENSIONS, TextureStitcher.TEXTURE_DIMENSIONS);
+		this.colorTexture = createColorTexture();
 		this.unbindBuffer();
 	}
 	
@@ -24,5 +24,10 @@ public class TextureFrameBuffer extends FrameBuffer{
 	
 	public int getColorTexture(){
 		return colorTexture;
+	}
+
+	@Override
+	protected void onBufferDeleted() {
+		
 	}
 }

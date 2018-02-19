@@ -22,7 +22,7 @@ import game.util.EnumDirection;
 public class TextureLoader {
 
 	public static void saveBufferColorTexture(FrameBuffer framebuffer, int width, int height, String filePath, String format) throws IOException{
-		framebuffer.bindBuffer(width, height);
+		framebuffer.bindBuffer();
 		int bpp = 4;
 		ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp);
 		GL11.glReadPixels(0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
@@ -50,13 +50,25 @@ public class TextureLoader {
 		framebuffer.unbindBuffer();
 	}
 	
-	public static LoadedTexture loadTextureToOpenGl(ByteBuffer buffer, int width, int height){
+	public static LoadedTexture loadTextureToOpenGl(TextureData data, ByteBuffer buffer, int width, int height){
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		int textureId = GL11.glGenTextures();
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
 		GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		//GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+		//GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		if(data.hasMinFilter()){
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, data.getMinFilter());
+		}
+		if(data.hasMagFilter()){
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, data.getMagFilter());
+		}
+		if(data.hasWrapS()){
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, data.getWrapS());
+		}
+		if(data.hasWrapT()){
+			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, data.getWrapT());
+		}
 		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 		return new LoadedTexture(textureId);
@@ -144,9 +156,9 @@ public class TextureLoader {
 		}
 	}
 	
-	public static LoadedTexture loadTexture(BufferedImage image){
+	public static LoadedTexture loadTexture(TextureData textureData, BufferedImage image){
 		ByteBuffer buffer = decodePngImage(image);
-		LoadedTexture loadedTexture = TextureLoader.loadTextureToOpenGl(buffer, image.getWidth(), image.getHeight());
+		LoadedTexture loadedTexture = TextureLoader.loadTextureToOpenGl(textureData, buffer, image.getWidth(), image.getHeight());
 		return loadedTexture;
 	}
 	

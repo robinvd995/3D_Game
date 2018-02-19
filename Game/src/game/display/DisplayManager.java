@@ -29,6 +29,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWCursorPosCallback;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
+import org.lwjgl.glfw.GLFWMouseButtonCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -45,21 +46,20 @@ public class DisplayManager {
 	private EnumDisplaySize windowSize;
 	
 	private int resolution = 720;
-	private float fov = 70;
+	private float fov = 85;
 	private float farPlane = 1000.0f;
 	private float nearPlane = 0.1f;
 	
 	public GLFWErrorCallback errorCallback;
 	public GLFWKeyCallback   keyCallback;
 	public GLFWCursorPosCallback cursorCallback;
+	public GLFWMouseButtonCallback mouseButtonCallback;
 	
 	private long window;
 	
 	private Matrix4f projectionMatrix;
 	
 	private List<IDisplaySizeListener> displaySizeListeners = new ArrayList<IDisplaySizeListener>();
-	
-	private boolean isCursorDisabled = false;
 	
 	public void initDisplay(final String displayText){
 		
@@ -95,6 +95,15 @@ public class DisplayManager {
 			
 		});
 		
+		GLFW.glfwSetMouseButtonCallback(window, mouseButtonCallback = new GLFWMouseButtonCallback(){
+
+			@Override
+			public void invoke(long window, int button, int action, int mods) {
+				InputManager.invokeMouseButton(button, action, mods);
+			}
+			
+		});
+		
 		initWindowResolution();
 		
 		glfwSwapInterval(1);
@@ -104,7 +113,7 @@ public class DisplayManager {
 		
 		initViewport();
 		
-		toggleCursor();
+		setCursorActive(false);
 	}
 	
 	public void swapBuffer(){
@@ -218,17 +227,12 @@ public class DisplayManager {
 		displaySizeListeners.add(listener);
 	}
 	
-	public void toggleCursor(){
-		if(isCursorDisabled){
+	public void setCursorActive(boolean active){
+		if(active){
 			GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
 		}
 		else{
 			GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 		}
-		isCursorDisabled = !isCursorDisabled;
-	}
-	
-	public boolean isCursorsDisabled(){
-		return isCursorDisabled;
 	}
 }

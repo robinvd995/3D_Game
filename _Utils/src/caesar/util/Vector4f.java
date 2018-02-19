@@ -9,6 +9,10 @@ public class Vector4f extends Vector3f{
 		this.w = 0;
 	}
 	
+	public Vector4f(float f) {
+		this(f, f, f, f);
+	}
+	
 	public Vector4f(float x, float y, float z, float w) {
 		super(x, y, z);
 		this.w = w;
@@ -19,6 +23,11 @@ public class Vector4f extends Vector3f{
 	}
 	
 	public void setW(float w){
+		this.w = w;
+	}
+	
+	public void set(float x, float y, float z, float w){
+		super.set(x, y, z);
 		this.w = w;
 	}
 	

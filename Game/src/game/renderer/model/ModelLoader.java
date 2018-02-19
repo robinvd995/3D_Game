@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL30;
 import converter.api.model.IndexedModel;
 import converter.api.model.IndexedVertex;
 import converter.api.model.ModelSection;
-import game.renderer.gui.Gui.GuiQuad;
 
 public class ModelLoader {
 
@@ -72,7 +71,7 @@ public class ModelLoader {
 		return loadedModel;
 	}
 
-	public GuiQuad loadGuiComponentQuad(float[] vertices, float[] uvs, int[] indices){
+	/*public GuiQuad loadGuiComponentQuad(float[] vertices, float[] uvs, int[] indices){
 		int vao = createVAO();
 		GuiQuad quad = new GuiQuad(vao);
 		quad.addVbo(bindIndicesBuffer(indices));
@@ -80,11 +79,30 @@ public class ModelLoader {
 		quad.addVbo(storeDataInAttribList(1, 2, uvs));
 		unbindVAO();
 		return quad;
+	}*/
+	
+	public SimpleModel load2DIndexedSimpleModel(float[] vertices, float[] uvs, int[] indices){
+		int vao = createVAO();
+		SimpleModel model = new SimpleModel(vao, indices.length);
+		model.addVbo(bindIndicesBuffer(indices));
+		model.addVbo(storeDataInAttribList(0, 2, vertices));
+		model.addVbo(storeDataInAttribList(1, 2, uvs));
+		unbindVAO();
+		return model;
+	}
+	
+	public SimpleModel load2DSimpleModel(float[] vertices, float[] uvs){
+		int vao = createVAO();
+		SimpleModel model = new SimpleModel(vao, vertices.length);
+		model.addVbo(storeDataInAttribList(0, 2, vertices));
+		model.addVbo(storeDataInAttribList(1, 2, uvs));
+		unbindVAO();
+		return model;
 	}
 	
 	public SimpleModel loadSimpleCube(float[] vertices){
 		int vao = createVAO();
-		SimpleModel model = new SimpleModel(vao);
+		SimpleModel model = new SimpleModel(vao, 36);
 		model.addVbo(storeDataInAttribList(0, 3, vertices));
 		return model;
 	}
@@ -118,7 +136,14 @@ public class ModelLoader {
 	
 	public StreamModel createStreamModel(){
 		int vao = createVAO();
-		StreamModel model = new StreamModel(vao);
+		StreamModel model = new StreamModel(vao, GL15.GL_STREAM_DRAW);
+		unbindVAO();
+		return model;
+	}
+	
+	public StreamModel createDynamicModel(){
+		int vao = createVAO();
+		StreamModel model = new StreamModel(vao, GL15.GL_DYNAMIC_DRAW);
 		unbindVAO();
 		return model;
 	}

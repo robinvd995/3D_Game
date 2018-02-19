@@ -3,24 +3,17 @@ package game.renderer.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL15;
 
-public class SimpleModel {
+public class SimpleModel extends ModelBase{
 
-	private int vao;
+	private final int size;
 	private List<Integer> vbos;
 	
-	public SimpleModel(int vao){
-		this.vao = vao;
+	public SimpleModel(int vao, int size){
+		super(vao);
 		this.vbos = new ArrayList<Integer>();
-	}
-	
-	public int getVao(){
-		return vao;
-	}
-	
-	public void bind(){
-		GL30.glBindVertexArray(vao);
+		this.size = size;
 	}
 	
 	public void addVbo(Integer vbo){
@@ -29,5 +22,16 @@ public class SimpleModel {
 	
 	public List<Integer> getVbos(){
 		return vbos;
+	}
+	
+	public int getSize(){
+		return size;
+	}
+	
+	public void delete(){
+		super.delete();
+		for(int vbo : vbos){
+			GL15.glDeleteBuffers(vbo);
+		}
 	}
 } 

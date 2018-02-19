@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
+import org.lwjgl.opengl.GL11;
+
 import game.block.Block;
 import game.renderer.block.BlockRenderData;
 import game.renderer.block.BlockRenderData.BlockRenderPart;
@@ -18,11 +20,11 @@ import game.util.EnumDirection;
 
 public class TextureManager {
 
-	private static final String BLOCK_TEXTURE_MAP_KEY = "blockTextureMap";
-
 	private static final HashMap<String,LoadedTexture> TEXTURE_MAP = new HashMap<String,LoadedTexture>();
 	private static HashMap<String,MappedTexture> blockTextures;
 
+	private static final TextureData BLOCK_TEXTURE_DATA = new TextureData("blockTextureMap").setMinFilter(GL11.GL_NEAREST).setMagFilter(GL11.GL_NEAREST);
+	
 	public static void loadAllTextures(){
 		Set<String> textures = new HashSet<String>();
 		for(int i = 0; i < Block.BLOCK_AMOUNT; i++){
@@ -44,8 +46,8 @@ public class TextureManager {
 			System.out.println(s + ":" + mappedTexture.toVector());
 		}
 
-		LoadedTexture loadedTexture = TextureLoader.loadTexture(result.getImage());
-		TEXTURE_MAP.put(BLOCK_TEXTURE_MAP_KEY, loadedTexture);
+		LoadedTexture loadedTexture = TextureLoader.loadTexture(BLOCK_TEXTURE_DATA, result.getImage());
+		TEXTURE_MAP.put(BLOCK_TEXTURE_DATA.getTexture(), loadedTexture);
 	}
 
 	public static MappedTexture getMappedBlockTexture(String texture){
@@ -53,19 +55,20 @@ public class TextureManager {
 	}
 	
 	public static LoadedTexture getBlockTextureMap(){
-		return TEXTURE_MAP.get(BLOCK_TEXTURE_MAP_KEY);
+		return TEXTURE_MAP.get(BLOCK_TEXTURE_DATA.getTexture());
 	}
 
 	public static void bindBlockTextureMap(){
-		bindTexture(BLOCK_TEXTURE_MAP_KEY);
+		bindTexture(BLOCK_TEXTURE_DATA);
 	}
 	
-	public static void bindTexture(String texture){
-		LoadedTexture loadedTexture = getTexture(texture);
+	public static void bindTexture(TextureData textureData){
+		LoadedTexture loadedTexture = getTexture(textureData);
 		TextureLoader.bindTexture(loadedTexture);
 	}
 	
-	private static LoadedTexture getTexture(String texture){
+	private static LoadedTexture getTexture(TextureData textureData){
+		String texture = textureData.getTexture();
 		if(TEXTURE_MAP.containsKey(texture)){
 			return TEXTURE_MAP.get(texture);
 		}
@@ -76,12 +79,21 @@ public class TextureManager {
 			try {
 				System.out.println(file.getAbsolutePath());
 				BufferedImage img = ImageIO.read(file);
-				loadedTexture = TextureLoader.loadTexture(img);
+				loadedTexture = TextureLoader.loadTexture(textureData, img);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			TEXTURE_MAP.put(texture, loadedTexture);
 			return loadedTexture;
 		}
+	}
+	
+	public static TextureData createDefaultGuiTexture(String texture){
+		return new TextureData(texture).setMinFilter(GL11.GL_LINEAR).setMagFilter(GL11.GL_LINEAR);
+	}
+
+	public static void deleteTexture(TextureData textureData) {
+		LoadedTexture texture = TEXTURE_MAP.get(textureData.getTexture());
+		GL11.glDeleteTextures(texture.getTextureID());
 	}
 }

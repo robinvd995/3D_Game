@@ -18,6 +18,8 @@ public class Key {
 	public static final Key A = new Key("A", GLFW.GLFW_KEY_A);
 	public static final Key D = new Key("D", GLFW.GLFW_KEY_D);
 	
+	public static final Key E = new Key("E", GLFW.GLFW_KEY_E);
+	
 	public static final Key ESC = new Key("Escape", GLFW.GLFW_KEY_ESCAPE);
 	public static final Key SPACE = new Key("Space", GLFW.GLFW_KEY_SPACE);
 	public static final Key LEFT_SHIFT = new Key("Left_Shift", GLFW.GLFW_KEY_LEFT_SHIFT);

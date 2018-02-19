@@ -17,16 +17,16 @@ public class Timer {
 	
 	private FpsCounter fpsCounter = null;
 	
-	public Timer(int tickRate){
+	protected Timer(int tickRate){
 		this.tickRate = tickRate;
 	}
 	
-	public void setInitialTime(){
+	protected void setInitialTime(){
 		lastTime = System.nanoTime();
 		lastTick = System.nanoTime();
 	}
 	
-	public boolean update(){
+	protected boolean update(){
 		
 		final long timerResolution = 1000000000L;
 		boolean tick = false;

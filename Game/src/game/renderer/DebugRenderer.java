@@ -3,6 +3,7 @@ package game.renderer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 import caesar.util.Matrix4f;
@@ -10,7 +11,6 @@ import game.display.DisplayManager;
 import game.renderer.debug.IDebuggable;
 import game.renderer.model.ModelLoader;
 import game.renderer.model.StreamModel;
-import game.renderer.shader.LineShader;
 import game.renderer.shader.Shader;
 import game.renderer.shader.ShaderBuilder;
 
@@ -31,7 +31,7 @@ public class DebugRenderer {
 		model = ModelLoader.INSTANCE.createStreamModel();
 		model.bindModel();
 		model.createIndexBuffer(24);
-		model.createDataBuffer("vertices", 24);
+		model.createDataBuffer("vertices", 0, 3, 24);
 		model.unbindModel();
 	}
 	
@@ -55,8 +55,8 @@ public class DebugRenderer {
 			shader.loadMatrix("modelMatrix", entry.getTransformationMatrix());
 			shader.loadVector3f("lineColor", entry.getLineColor());
 			model.updateIndexBuffer(entry.getIndices());
-			model.updateDataBuffer("vertices", entry.getVertexPositions());
-			model.render(entry.getIndices().length);
+			model.updateDataBuffer("vertices", 3, entry.getVertexPositions());
+			GL11.glDrawElements(GL11.GL_LINES, model.getSize(), GL11.GL_UNSIGNED_INT, 0);
 		}
 	}
 	

@@ -19,8 +19,8 @@ import game.Game;
 import game.renderer.block.BlockRenderManager;
 import game.renderer.block.BlockRenderRegistry;
 import game.renderer.entity.EntityRenderManager;
+import game.renderer.gui.GuiHud;
 import game.renderer.gui.GuiRenderManager;
-import game.renderer.gui.TestGui;
 import game.renderer.model.ModelLoader;
 import game.renderer.texture.TextureManager;
 import game.renderer.world.SkyboxRenderManager;
@@ -54,7 +54,9 @@ public class RenderManager {
 		guiRenderer.initRenderer();
 		skyboxRenderer.initRenderer();
 		
-		TestGui testGui = new TestGui();
+		GuiHud testGui = new GuiHud(0, 0);
+		//GuiMenu hud = new GuiMenu();
+		//Game.INSTANCE.openGui(hud);
 		Game.INSTANCE.openGui(testGui);
 	}
 	
