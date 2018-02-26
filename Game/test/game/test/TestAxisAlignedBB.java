@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import caesar.util.Vector3f;
-import game.physics.AxisAlignedBB;
+import game.common.physics.AxisAlignedBB;
 
 public class TestAxisAlignedBB {
 

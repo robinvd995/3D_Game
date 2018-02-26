@@ -1,2 +1,3 @@
-CHANGE SHADERS!!!! VERY ANNYONING AND STATIC AT THE MOMENT! SHADERS NEED TO AUTO DETECT UNIFORMS AND ATTRIBUTE LOCATIONS!
-1. Netty implementation (just the basics), proxy with IProxy, CommonProxy, ClientProxy, ServerProxy
+ACTIVE GUI selection
+CLUSTER RENDERING, creating a "cluster" and creating the mesh from this cluster to minimize the amount of draw calls that need to be send, cluster size 16x16x16
+Netty implementation (just the basics), proxy with IProxy, CommonProxy, ClientProxy, ServerProxy

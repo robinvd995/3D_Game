@@ -4,10 +4,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import caesar.util.Vector3f;
-import game.physics.AxisAlignedBB;
-import game.physics.Ray;
-import game.physics.RayResult;
-import game.util.EnumDirection;
+import game.common.physics.AxisAlignedBB;
+import game.common.physics.Ray;
+import game.common.physics.RayResult;
+import game.common.util.EnumDirection;
 
 public class TestRayIntersection {
 

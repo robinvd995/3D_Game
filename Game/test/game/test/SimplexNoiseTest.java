@@ -1,6 +1,6 @@
 package game.test;
 
-import game.util.SimplexNoise;
+import game.common.util.SimplexNoise;
 
 public class SimplexNoiseTest {
 

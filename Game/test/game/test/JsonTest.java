@@ -1,14 +1,9 @@
 package game.test;
 
-import java.util.HashMap;
-
 import org.junit.Test;
 
-import com.google.gson.Gson;
-
-import game.block.Block;
-import game.renderer.block.BlockRenderData;
-import game.renderer.block.BlockRenderData.BlockRenderPart;
+import game.client.renderer.block.BlockRenderData;
+import game.common.block.Block;
 
 public class JsonTest {
 
