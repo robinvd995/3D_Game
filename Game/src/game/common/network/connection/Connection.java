@@ -9,7 +9,7 @@ import game.common.network.packet.PacketManager;
 
 public class Connection<T extends IPacket> {
 
-	private Socket socket;
+	public Socket socket;
 	
 	private NetworkInput<T> input;
 	private NetworkOutput<T> output;
@@ -18,6 +18,8 @@ public class Connection<T extends IPacket> {
 	private Thread outputThread;
 	
 	private ConnectionDetails connectionDetails;
+	
+	private volatile boolean needsDisconnect = false;
 	
 	//private volatile boolean isConnected = false;
 	
@@ -59,8 +61,10 @@ public class Connection<T extends IPacket> {
 	 */
 	public void startConnection(PacketManager<T> packetManager){
 		try {
-			input = new NetworkInput<T>(socket.getInputStream(), packetManager);
+			input = new NetworkInput<T>(socket.getInputStream(), packetManager, this);
 			output = new NetworkOutput<T>(socket.getOutputStream(), packetManager);
+			
+			System.out.println("Out initialized!");
 			
 			inputThread = new Thread(input);
 			outputThread = new Thread(output);
@@ -69,6 +73,15 @@ public class Connection<T extends IPacket> {
 			outputThread.start();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Ticks the connection, this is only used to check if the connection needs to be terminated
+	 */
+	public void tick(){
+		if(needsDisconnect){
+			closeConnection();
 		}
 	}
 	
@@ -104,7 +117,7 @@ public class Connection<T extends IPacket> {
 	 * @return true if the socket is connected
 	 */
 	public boolean isConnected(){
-		return socket.isConnected();
+		return socket.isConnected() && !needsDisconnect;
 	}
 	
 	/**
@@ -130,5 +143,9 @@ public class Connection<T extends IPacket> {
 		}
 		
 		System.out.println("Connection closed!");
+	}
+
+	public synchronized void disconnect() {
+		needsDisconnect = true;
 	}
 }

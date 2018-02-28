@@ -5,10 +5,13 @@ import game.client.network.packet.ClientPacketDisconnect;
 import game.client.network.packet.ClientPacketTest1;
 import game.client.network.packet.ClientPacketTest2;
 import game.client.network.packet.IClientPacket;
+import game.common.config.Configuration;
+import game.common.config.ConfigurationException;
 import game.common.network.connection.Connection;
 import game.common.network.connection.ConnectionDetails;
 import game.common.network.packet.IPacket;
 import game.common.network.packet.PacketManager;
+import game.common.network.packet.PacketPlayerConnect;
 
 public class Client {
 
@@ -17,11 +20,17 @@ public class Client {
 	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 
 	private Connection<IClientPacket> connection;
-
 	private PacketManager<IClientPacket> packetManager = new PacketManager<IClientPacket>();
+
+	private Configuration config;
 
 	private Client(String ip, int port, int timeout){
 		this.connection = new Connection<IClientPacket>(new ConnectionDetails(ip, port).setTimeout(timeout));
+		try {
+			this.config = Configuration.loadConfig("client");
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void registerPackets(){
@@ -44,12 +53,24 @@ public class Client {
 
 	private void start(){
 		this.connection.startConnection(packetManager);
+
+		String playerName = "ERROR";
+		try {
+			playerName = config.getString("player", "name");
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+		}
+
+		sendPacket(new PacketPlayerConnect(playerName));
 	}
 
 	public void tick(){
-		while(connection.hasPacket()){
-			IClientPacket packet = connection.getNextPacket();
-			packet.execute();
+		connection.tick();
+		if(connection.isConnected()){
+			while(connection.hasPacket()){
+				IClientPacket packet = connection.getNextPacket();
+				packet.execute(this);
+			}
 		}
 	}
 

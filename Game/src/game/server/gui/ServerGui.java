@@ -23,7 +23,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
+import com.google.common.eventbus.Subscribe;
+
+import game.common.event.EventManager;
 import game.server.Server;
+import game.server.event.PlayerDisconnectEvent;
+import game.server.event.PlayerJoinedEvent;
 import game.server.io.IStreamListener;
 import game.server.io.Logger;
 
@@ -90,6 +95,8 @@ public class ServerGui extends Thread {
 		Logger.addInfoStreamListener(new GuiStreamListener(allTextArea, infoTextArea));
 		Logger.addErrorStreamListener(new GuiStreamListener(allTextArea, errorTextArea));
 
+		EventManager.registerEventListener(this);
+		
 		isInitialized = true;
 	}
 
@@ -275,6 +282,27 @@ public class ServerGui extends Thread {
 				commandsEntered.removeLast();
 			}
 		}
+	}
+	
+	@Subscribe
+	public void onPlayerJoinedEvent(PlayerJoinedEvent event){
+		System.out.println("player joined event");
+		updatePlayerList();
+	}
+	
+	@Subscribe
+	public void onPlayerDisconnectEvent(PlayerDisconnectEvent event){
+		System.out.println("player disconnect event");
+		updatePlayerList();
+	}
+	
+	private void updatePlayerList(){
+		playerListModel.clear();
+		for(String player : Server.INSTANCE.playerManager.getAllPlayers()){
+			playerListModel.addElement(player);
+		}
+		playerList.setModel(playerListModel);
+		playerList.repaint();
 	}
 
 	private class CommandHistoryListener implements KeyListener {

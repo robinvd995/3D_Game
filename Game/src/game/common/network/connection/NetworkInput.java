@@ -15,18 +15,23 @@ public class NetworkInput<T extends IPacket> implements Runnable{
 	
 	private InputStream inStream;
 	
+	private boolean isInitialized = false;
 	private boolean isClosed = false;
 	
 	private PacketManager<T> packetManager;
 	
-	public NetworkInput(InputStream inStream, PacketManager<T> packetManager){
+	private Connection<T> connection;
+	
+	public NetworkInput(InputStream inStream, PacketManager<T> packetManager, Connection<T> connection){
 		this.inStream = inStream;
 		this.packetManager = packetManager;
+		this.connection = connection;
 		this.incomingPackets = new ConcurrentLinkedQueue<T>();
 	}
 	
 	@Override
 	public void run() {
+		isInitialized = true;
 		while(!isClosed){
 			listenToServer();
 		}
@@ -39,6 +44,7 @@ public class NetworkInput<T extends IPacket> implements Runnable{
 		if(flag == -1){
 			System.out.println("closing the input stream!");
 			isClosed = true;
+			connection.disconnect();
 		}
 		else{
 			DataBuffer buffer = DataBuffer.readFromStream(inStream);
@@ -70,5 +76,9 @@ public class NetworkInput<T extends IPacket> implements Runnable{
 	
 	public void close(){
 		isClosed = true;
+	}
+	
+	public boolean isInitialized(){
+		return isInitialized;
 	}
 }

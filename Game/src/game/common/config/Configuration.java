@@ -1,11 +1,14 @@
 package game.common.config;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Configuration {
 
@@ -21,39 +24,61 @@ public class Configuration {
 		categoryMap.put(category, new CategoryContainer());
 	}
 
-	private void addInteger(String cat, String name, int value){
-		categoryMap.get(cat).setInteger(name, value);
+	private void add(String cat, String name, EnumConfigType type, String value){
+		categoryMap.get(cat).add(name, type, value);
+	}
+	
+	public void setValue(String category, String name, String value) throws ConfigurationException{
+		categoryMap.get(category).set(name, value);
 	}
 
-	private void addBoolean(String cat, String name, boolean value){
-		categoryMap.get(cat).setBoolean(name, value);
-	}
-
-	private void addFloat(String cat, String name, float value){
-		categoryMap.get(cat).setFloat(name, value);
-	}
-
-	private void addString(String cat, String name, String value){
-		categoryMap.get(cat).setString(name, value);
-	}
-
-	public int getInteger(String cat, String name){
+	public int getInteger(String cat, String name) throws ConfigurationException{
 		return categoryMap.get(cat).getInteger(name);
 	}
 	
-	public boolean getBoolean(String cat, String name){
+	public boolean getBoolean(String cat, String name) throws ConfigurationException{
 		return categoryMap.get(cat).getBoolean(name);
 	}
 	
-	public float getFloat(String cat, String name){
+	public float getFloat(String cat, String name) throws ConfigurationException{
 		return categoryMap.get(cat).getFloat(name);
 	}
 	
-	public String getString(String cat, String name){
+	public String getString(String cat, String name) throws ConfigurationException{
 		return categoryMap.get(cat).getString(name);
 	}
 	
-	public static Configuration loadConfig(String filePath){
+	public void saveConfig(){
+		File file = new File(filePath);
+		BufferedWriter writer = null;
+		try {
+			writer = new BufferedWriter(new FileWriter(file));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		if(writer == null)
+			return;
+		
+		Set<String> categories = categoryMap.keySet();
+		for(String s : categories){
+			writeLine(writer, s + "{");
+			CategoryContainer container = categoryMap.get(s);
+			for(ConfigEntry entry : container.getEntries()){
+				String line = "    " + entry.toString();
+				writeLine(writer, line);
+			}
+			writeLine(writer, "}");
+		}
+		
+		try {
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static Configuration loadConfig(String filePath) throws ConfigurationException{
 
 		String file = filePath + ".cfg";
 		File cfgFile = new File(file);
@@ -98,23 +123,8 @@ public class Configuration {
 					throw new ConfigurationException("Invalid attribute found!");
 				}
 
-				switch(args[1]){
-				case "integer":
-					config.addInteger(currentCategory, args[0], Integer.valueOf(args[2]));
-					break;
-
-				case "boolean":
-					config.addBoolean(currentCategory, args[0], Boolean.valueOf(args[2]));
-					break;
-
-				case "float":
-					config.addFloat(currentCategory, args[0], Float.valueOf(args[2]));
-					break;
-
-				case "string":
-					config.addString(currentCategory, args[0], args[2]);
-					break;
-				}
+				EnumConfigType type = EnumConfigType.valueOf(args[1].toUpperCase());
+				config.add(currentCategory, args[0], type, args[2]);
 			}
 		}
 		
@@ -128,53 +138,14 @@ public class Configuration {
 			return null;
 		}
 	}
-
-	public static class ConfigurationException extends RuntimeException {
-
-		public ConfigurationException(String s){
-			super(s);
-		}
-	}
 	
-	public static class CategoryContainer {
-		
-		private HashMap<String,Integer> integerMap = new HashMap<String,Integer>();
-		private HashMap<String,Float> floatMap = new HashMap<String,Float>();
-		private HashMap<String,Boolean> boolMap = new HashMap<String,Boolean>();
-		private HashMap<String,String> stringMap = new HashMap<String,String>();
-		
-		private CategoryContainer(){}
-		
-		private int getInteger(String name){
-			return integerMap.get(name);
+	private static void writeLine(BufferedWriter writer, String line){
+		try{
+			writer.write(line);
+			writer.newLine();
 		}
-		
-		private float getFloat(String name){
-			return floatMap.get(name);
-		}
-		
-		private boolean getBoolean(String name){
-			return boolMap.get(name);
-		}
-		
-		private String getString(String name){
-			return stringMap.get(name);
-		}
-		
-		private void setInteger(String name, int value){
-			integerMap.put(name, value);
-		}
-		
-		private void setFloat(String name, float value){
-			floatMap.put(name, value);
-		}
-		
-		private void setBoolean(String name, boolean value){
-			boolMap.put(name, value);
-		}
-		
-		private void setString(String name, String value){
-			stringMap.put(name, value);
+		catch(IOException e){
+			e.printStackTrace();
 		}
 	}
 }

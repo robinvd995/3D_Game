@@ -28,7 +28,7 @@ public class PacketClientDisconnect implements IPacket{
 
 	@Override
 	public int getPacketId() {
-		return 1;
+		return 99;
 	}
 
 }

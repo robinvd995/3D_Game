@@ -3,33 +3,31 @@ package game.common.network.packet;
 import game.common.network.io.IInputBuffer;
 import game.common.network.io.IOutputBuffer;
 
-public class PacketChat implements IPacket{
+public class PacketPlayerConnect implements IPacket{
 
-	protected String message;
+	protected String playerName;
 	
-	public PacketChat(){}
-	
-	public PacketChat(String message){
-		this.message = message;
+	public PacketPlayerConnect(String playerName){
+		this.playerName = playerName;
 	}
 	
 	@Override
 	public void in(IInputBuffer in) {
-		message = in.readString();
+		playerName = in.readString();
 	}
 
 	@Override
 	public void out(IOutputBuffer out) {
-		out.writeString(message);
+		out.writeString(playerName);
 	}
 
 	@Override
 	public int getPacketSize() {
-		return message.length() + 1;
+		return playerName.length() + 1;
 	}
 
 	@Override
 	public int getPacketId() {
-		return 1;
+		return 0;
 	}
 }

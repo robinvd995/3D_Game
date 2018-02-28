@@ -1,5 +1,6 @@
 package game.client.network.packet;
 
+import game.client.network.Client;
 import game.common.network.packet.PacketChat;
 
 public class ClientPacketChat extends PacketChat implements IClientPacket{
@@ -11,7 +12,7 @@ public class ClientPacketChat extends PacketChat implements IClientPacket{
 	}
 	
 	@Override
-	public void execute() {
+	public void execute(Client client) {
 		System.out.println(message);
 	}
 }

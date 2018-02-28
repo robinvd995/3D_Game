@@ -23,16 +23,24 @@ public class ConnectionClient {
 	}
 
 	public void tick(){
-		while(connection.hasPacket()){
-			IServerPacket packet = connection.getNextPacket();
-			packet.execute(this);
+		connection.tick();
+		if(connection.isConnected()){
+			while(connection.hasPacket()){
+				IServerPacket packet = connection.getNextPacket();
+				packet.execute(this);
+			}
 		}
-
-		if(!connection.isConnected()){
+		else{
+			System.out.println("Stopping!");
 			stop();
 		}
 	}
 
+	protected void finalize() throws Throwable{
+		System.out.println("finalizing!!!!");
+		super.finalize();
+	}
+	
 	public void sendPacket(IPacket packet){
 		connection.sendPacket(packet);
 	}
@@ -54,7 +62,7 @@ public class ConnectionClient {
 		e.printStackTrace();
 	}
 }*/
-	
+
 	//private Socket socket;
 
 	//private volatile boolean connected = false;
@@ -72,7 +80,7 @@ public class ConnectionClient {
 	IServerPacket packet = incomingPackets.poll();
 	packet.execute(this);
 }*/
-	
+
 	/*clientOutput.addPacket(packet);
 	synchronized(clientOutput){
 		clientOutput.notify();

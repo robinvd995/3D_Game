@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import game.common.config.Configuration;
+import game.common.config.ConfigurationException;
+import game.common.event.EventManager;
 import game.common.network.packet.PacketManager;
 import game.server.command.CommandContainer;
 import game.server.command.CommandListener;
@@ -16,6 +18,7 @@ import game.server.io.Logger;
 import game.server.network.packet.IServerPacket;
 import game.server.network.packet.ServerPacketChat;
 import game.server.network.packet.ServerPacketClientDisconnect;
+import game.server.network.packet.ServerPacketPlayerConnect;
 import game.server.network.packet.ServerPacketTest1;
 import game.server.network.packet.ServerPacketTest2;
 
@@ -25,7 +28,7 @@ public class Server {
 
 	private HashMap<UUID,ConnectionClient> connectionMap;
 
-	private volatile Queue<Socket> clientsToAdd;
+	private volatile Queue<ConnectionClient> clientsToAdd;
 	private volatile Queue<ConnectionClient> clientsToDisconnect;
 
 	private ConnectionListener connectionListener;
@@ -38,6 +41,8 @@ public class Server {
 
 	private Configuration config;
 	
+	public PlayerManager playerManager;
+	
 	private Server(){
 		connectionMap = new HashMap<UUID,ConnectionClient>();
 		Thread.currentThread().setName("server");
@@ -45,10 +50,15 @@ public class Server {
 
 	public void init(){
 		registerPackets();
-		config = Configuration.loadConfig("server");
+		try {
+			config = Configuration.loadConfig("server");
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void registerPackets(){
+		packetManager.registerPacket(ServerPacketPlayerConnect.class);
 		packetManager.registerPacket(ServerPacketChat.class);
 		packetManager.registerPacket(ServerPacketClientDisconnect.class);
 		packetManager.registerPacket(ServerPacketTest1.class);
@@ -58,11 +68,17 @@ public class Server {
 	protected int start(){
 		isRunning = true;
 		//Instantiate the queue for clients to add
-		clientsToAdd = new ConcurrentLinkedQueue<Socket>();
+		clientsToAdd = new ConcurrentLinkedQueue<ConnectionClient>();
 		clientsToDisconnect = new ConcurrentLinkedQueue<ConnectionClient>();
 		commandQueue = new ConcurrentLinkedQueue<CommandContainer>();
+		playerManager = new PlayerManager();
 		//Instantiate the connection listener and listen for connections
-		int port = config.getInteger("network", "port");
+		int port = 25565;
+		try {
+			port = config.getInteger("network", "port");
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+		}
 		connectionListener = new ConnectionListener(port);
 		connectionListener.startListening();
 
@@ -71,7 +87,11 @@ public class Server {
 	}
 
 	public void run(){
+		
+		EventManager.firePreUpdateEvents();
+		
 		checkConnectionsToAdd();
+		checkConnectionsToRemove();
 		checkCommands();
 		try {
 			connectionMap.values().forEach(client -> client.tick());
@@ -79,14 +99,22 @@ public class Server {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		EventManager.firePostUpdateEvents();
+	}
+
+	private void checkConnectionsToRemove() {
+		while(!clientsToDisconnect.isEmpty()){
+			ConnectionClient client = clientsToDisconnect.poll();
+			playerManager.removePlayer(client.getClientId());
+			connectionMap.remove(client.getClientId());
+		}
 	}
 
 	private void checkConnectionsToAdd(){
 		while(!clientsToAdd.isEmpty()){
-			Socket clientSocket = clientsToAdd.poll();
-			UUID id = UUID.randomUUID();
-			ConnectionClient connection = new ConnectionClient(clientSocket, id);
-			connectionMap.put(id, connection);
+			ConnectionClient connection = clientsToAdd.poll();
+			connectionMap.put(connection.getClientId(), connection);
 			connection.startConnection();
 		}
 	}
@@ -116,7 +144,9 @@ public class Server {
 
 	public synchronized void addClientToConnect(Socket client){
 		Logger.logInfo("Client connected!");
-		clientsToAdd.add(client);
+		UUID id = UUID.randomUUID();
+		ConnectionClient connection = new ConnectionClient(client, id);
+		clientsToAdd.add(connection);
 	}
 
 	public synchronized void addClientToDisconnect(ConnectionClient client){
