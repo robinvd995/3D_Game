@@ -1,40 +1,136 @@
 package game.client.network;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketException;
+import game.client.network.packet.ClientPacketChat;
+import game.client.network.packet.ClientPacketDisconnect;
+import game.client.network.packet.ClientPacketTest1;
+import game.client.network.packet.ClientPacketTest2;
+import game.client.network.packet.IClientPacket;
+import game.common.network.connection.Connection;
+import game.common.network.connection.ConnectionDetails;
+import game.common.network.packet.IPacket;
+import game.common.network.packet.PacketManager;
 
-public class Client extends Thread{
+public class Client {
 
 	private static Client theClient;
-	
-	private final String ip;
-	private final int port;
-	private final int timeout;
 
-	private static volatile ConnectionStatus status = ConnectionStatus.DISCONNECTED;
+	private ConnectionStatus status = ConnectionStatus.DISCONNECTED;
 
-	private Socket socket;
+	private Connection<IClientPacket> connection;
+
+	private PacketManager<IClientPacket> packetManager = new PacketManager<IClientPacket>();
 
 	private Client(String ip, int port, int timeout){
-		this.ip = ip;
-		this.port = port;
-		this.timeout = timeout;
+		this.connection = new Connection<IClientPacket>(new ConnectionDetails(ip, port).setTimeout(timeout));
 	}
 
-	@Override
-	public void run(){
-		tryConnecting();
+	private void registerPackets(){
+		packetManager.registerPacket(ClientPacketChat.class);
+		packetManager.registerPacket(ClientPacketDisconnect.class);
+		packetManager.registerPacket(ClientPacketTest1.class);
+		packetManager.registerPacket(ClientPacketTest2.class);
+	}
 
-		while(status == ConnectionStatus.CONNECTED){
-			
+	private void connect(){
+		status = ConnectionStatus.CONNECTING;
+		connection.connect();
+		if(connection.isConnected()){
+			status = ConnectionStatus.CONNECTED;
 		}
-		
-		cleanUp();
+		else{
+			status = ConnectionStatus.CONNECTION_ERROR;
+		}
 	}
 
-	private void tryConnecting(){
+	private void start(){
+		this.connection.startConnection(packetManager);
+	}
+
+	public void tick(){
+		while(connection.hasPacket()){
+			IClientPacket packet = connection.getNextPacket();
+			packet.execute();
+		}
+	}
+
+	public static synchronized ConnectionStatus getConnectionStatus(){
+		return theClient.status;
+	}
+
+	public static void createClient(String ip, int port, int timeout){
+		theClient = new Client(ip, port, timeout);
+		theClient.registerPackets();
+		theClient.connect();
+		if(theClient.status == ConnectionStatus.CONNECTED)
+			theClient.start();
+	}
+
+	public static void stopClient(){
+		System.out.println("Stopping client!");
+		theClient.connection.closeConnection();
+	}
+
+	public static boolean hasClient(){
+		return theClient != null;
+	}
+
+	public static void sendPacket(IPacket packet){
+		theClient.connection.sendPacket(packet);
+	}
+
+	public static void tickClient(){
+		if(theClient != null){
+			theClient.tick();
+		}
+	}
+
+
+	/*private final String ip;
+	private final int port;
+	private final int timeout;*/
+
+	//private volatile Queue<IPacket> outgoingPackets = new ConcurrentLinkedQueue<IPacket>();
+	//private volatile Queue<IClientPacket> incomingPackets = new ConcurrentLinkedQueue<IClientPacket>();
+
+	//private ClientInput clientInput;
+	//private ClientOutput clientOutput;
+
+	/*private NetworkInput<IClientPacket> clientInput;
+	private NetworkOutput<IClientPacket> clientOutput;
+
+	private Thread clientInputThread;
+	private Thread clientOutputThread;*/
+
+	//private Socket socket;
+
+	/*public static void sendPacket(IPacket packet){
+		/*System.out.println("Sending packet to server!");
+		theClient.clientOutput.addPacket(packet);
+		synchronized(theClient.clientOutput){
+			theClient.clientOutput.notify();
+		}
+	}*/
+
+	/*private void start(){
+		tryConnecting();
+		if(status == ConnectionStatus.CONNECTED){
+
+			try {
+				clientOutput = new NetworkOutput<IClientPacket>(socket.getOutputStream(), packetManager);
+				clientInput = new NetworkInput<IClientPacket>(socket.getInputStream(), packetManager);
+
+				clientInputThread = new Thread(clientInput);
+				clientOutputThread = new Thread(clientOutput);
+
+				clientInputThread.start();
+				clientOutputThread.start();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}*/
+
+	/*private void tryConnecting(){
 
 		status = ConnectionStatus.CONNECTING;
 
@@ -58,32 +154,67 @@ public class Client extends Thread{
 		if(socket.isConnected()){
 			status = ConnectionStatus.CONNECTED;
 		}
-	}
+	}*/
 
-	private void cleanUp(){
-		//theClient = null;
-		try {
-			socket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+	/*private class ClientInput implements Runnable{
+
+		@Override
+		public void run() {
+			while(status == ConnectionStatus.CONNECTED){
+				try {
+					listenToServer();
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.out.println("Catch!");
+				}
+			}
+
+			System.out.println("Client input thread stopped!");
+		}
+
+		private void listenToServer() throws IOException{
+			InputStream inStream = socket.getInputStream();
+			int size = 0;
+			try{
+				size = inStream.read();
+			}
+			catch(SocketException e){
+				return;
+			}
+			DataBuffer buffer = DataBuffer.readFromStream(inStream, size);
+			IClientPacket packet = packetManager.getIncomingPacket(buffer);
+			incomingPackets.add(packet);
+			packet.execute();
 		}
 	}
-	
-	public static synchronized ConnectionStatus getConnectionStatus(){
-		return status;
-	}
 
-	public static void createClient(String ip, int port, int timeout){
-		theClient = new Client(ip, port, timeout);
-		status = ConnectionStatus.DISCONNECTED;
-		theClient.start();
-	}
-	
-	public static void stopClient(){
-		status = ConnectionStatus.DISCONNECTED;
-	}
-	
-	public static boolean hasClient(){
-		return theClient != null;
-	}
+	public class ClientOutput implements Runnable{
+
+		@Override
+		public void run() {
+			while(status == ConnectionStatus.CONNECTED){
+
+				while(!outgoingPackets.isEmpty()){
+					IPacket packet = outgoingPackets.poll();
+					System.out.println("Sending packet: " + packet.getPacketId());
+					DataBuffer buffer = packetManager.writePacket(packet);
+					try {
+						buffer.writeToStream(socket.getOutputStream());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				synchronized(this){
+					try {
+						this.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			System.out.println("Outgoing socket closing!");
+		}
+
+	}*/
 }

@@ -36,7 +36,7 @@ public class ConnectionListener extends Thread{
 			try {
 				Socket clientSocket = socket.accept();
 				Logger.logInfo("Client trying to connect...");
-				Server.INSTANCE.addClient(clientSocket);
+				Server.INSTANCE.addClientToConnect(clientSocket);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

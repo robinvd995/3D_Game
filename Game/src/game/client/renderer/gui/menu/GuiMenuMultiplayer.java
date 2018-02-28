@@ -44,7 +44,15 @@ public class GuiMenuMultiplayer extends Gui {
 		switch(action){
 		case 0:
 			String ip = ipTextBox.getText();
-			int port = Integer.parseInt(portTextBox.getText());
+			String portS = portTextBox.getText();
+			
+			if(ip == "" || portS == ""){
+				ip = "localhost";
+				portS = "25565";
+			}
+			
+			int port = Integer.valueOf(portS);
+			
 			Client.createClient(ip, port, 2000);
 			notificationGui = new GuiNotification();
 			EventManager.postPostUpdateEvent(new GuiOpenEvent(notificationGui));

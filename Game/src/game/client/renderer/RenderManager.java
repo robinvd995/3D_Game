@@ -95,7 +95,7 @@ public class RenderManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		System.out.println("cleanup");
+		System.out.println("cleanup renderers");
 		ModelLoader.INSTANCE.cleanUp();
 	}
 	

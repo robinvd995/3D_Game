@@ -1,5 +1,6 @@
 package game.server.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -10,10 +11,13 @@ import java.util.LinkedList;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -29,7 +33,7 @@ public class ServerGui extends Thread {
 	
 	private JFrame frame;
 
-	private JPanel mainPanel;
+	private JSplitPane mainPanel;
 
 	private JPanel consolePanel;
 	private JTabbedPane tabbedPane;
@@ -44,6 +48,10 @@ public class ServerGui extends Thread {
 	private JButton commandButton;
 
 	private JPanel statusPanel;
+	
+	private JPanel playerPanel;
+	private JList<String> playerList;
+	private DefaultListModel<String> playerListModel;
 
 	private static volatile boolean isInitialized = false;
 
@@ -65,11 +73,16 @@ public class ServerGui extends Thread {
 		frame.setTitle("Game Server 0.0.1");
 
 		SpringLayout mainLayout = new SpringLayout();
-		mainPanel = new JPanel(mainLayout);
 
 		initLogPanel(mainLayout);
 		initStatusPanel(mainLayout);
 
+		JScrollPane statusScrollPane = new JScrollPane(statusPanel);
+		
+		mainPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, statusScrollPane, consolePanel);
+		mainPanel.setOneTouchExpandable(true);
+		mainPanel.setDividerSize(3);
+		mainPanel.setDividerLocation(324);
 		frame.add(mainPanel);
 
 		frame.setVisible(true);
@@ -84,6 +97,7 @@ public class ServerGui extends Thread {
 
 		consolePanel = new JPanel();
 		consolePanel.setPreferredSize(new Dimension(400,400));
+		consolePanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setPreferredSize(new Dimension(400, 370));
@@ -161,21 +175,42 @@ public class ServerGui extends Thread {
 		mainLayout.putConstraint(SpringLayout.SOUTH, consolePanel, -2, SpringLayout.SOUTH, mainPanel);
 		mainLayout.putConstraint(SpringLayout.NORTH, consolePanel, 4, SpringLayout.NORTH, mainPanel);
 
-		mainPanel.add(consolePanel);
+		//mainPanel.add(consolePanel);
 	}
 
 	private void initStatusPanel(SpringLayout mainLayout){
 
-		statusPanel = new JPanel();
-		statusPanel.setPreferredSize(new Dimension(300, 400));
-		statusPanel.setBorder(BorderFactory.createTitledBorder("Status"));
+		SpringLayout statusLayout = new SpringLayout();
+		
+		statusPanel = new JPanel(statusLayout);
+		statusPanel.setPreferredSize(new Dimension(300, 200));
+		statusPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 
 		mainLayout.putConstraint(SpringLayout.EAST, consolePanel, -4, SpringLayout.WEST, statusPanel);
 		mainLayout.putConstraint(SpringLayout.SOUTH, statusPanel, 0, SpringLayout.SOUTH, mainPanel);
 		mainLayout.putConstraint(SpringLayout.EAST, statusPanel, 0, SpringLayout.EAST, mainPanel);
 		mainLayout.putConstraint(SpringLayout.NORTH, statusPanel, 0, SpringLayout.NORTH, mainPanel);
-
-		mainPanel.add(statusPanel);
+		
+		playerPanel = new JPanel();
+		playerPanel.setPreferredSize(new Dimension(300, 200));
+		playerPanel.setBorder(BorderFactory.createTitledBorder("Players"));
+		playerPanel.setLayout(new BorderLayout());
+		
+		playerList = new JList<String>();
+		playerListModel = new DefaultListModel<String>();
+		playerList.setModel(playerListModel);
+		playerListModel.addElement("Player");
+		playerListModel.addElement("Hello");
+		playerList.setPreferredSize(new Dimension(280, 300));
+		playerList.setBorder(BorderFactory.createEtchedBorder());
+		
+		statusLayout.putConstraint(SpringLayout.NORTH, playerPanel, 0, SpringLayout.NORTH, statusPanel);
+		statusLayout.putConstraint(SpringLayout.EAST, playerPanel, 0, SpringLayout.EAST, statusPanel);
+		statusLayout.putConstraint(SpringLayout.WEST, playerPanel, 0, SpringLayout.WEST, statusPanel);
+		
+		playerPanel.add(playerList, BorderLayout.CENTER);
+		
+		statusPanel.add(playerPanel);
 	}
 
 	public static void initGui(){

@@ -1,4 +1,4 @@
-package game.server.util;
+package game.common.network.io;
 
 public interface IInputBuffer {
 

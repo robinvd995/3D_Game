@@ -1,4 +1,4 @@
-package game.common.util;
+package game.client.util;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

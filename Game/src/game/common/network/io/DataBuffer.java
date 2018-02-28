@@ -1,5 +1,6 @@
-package game.server.util;
+package game.common.network.io;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,7 +12,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 
 	private int writePosition = 0;
 	private int readPosition = 0;
-	
+
 	public DataBuffer(int size){
 		byteArray = new byte[size];
 	}
@@ -19,7 +20,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 	public DataBuffer(byte[] array){
 		byteArray = array;
 	}
-	
+
 	public byte[] read(int x){
 		byte[] b = new byte[x];
 		for(int i = 0; i < x; i++){
@@ -27,7 +28,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 		}
 		return b;
 	}
-	
+
 	public byte readByte() {
 		//checkReadingBufferSize(1);
 		return 	byteArray[readPosition++];
@@ -38,7 +39,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 		return 	(byteArray[readPosition++] & 0xFF) << 8 | 
 				(byteArray[readPosition++] & 0xFF);
 	}
-	
+
 	public float readFloat() {
 		//checkReadingBufferSize(4);
 		return Float.intBitsToFloat(
@@ -47,12 +48,12 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 				(byteArray[readPosition++] & 0xFF) << 8 |
 				(byteArray[readPosition++] & 0xFF));
 	}
-	
+
 	public double readDouble() {
 		//checkReadingBufferSize(8);
 		return ByteBuffer.wrap(read(8)).getDouble();
 	}
-	
+
 	public long readLong() {
 		//checkReadingBufferSize(8);
 		return ByteBuffer.wrap(read(8)).getLong();
@@ -81,7 +82,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 			byteArray[writePosition++] = x[i];
 		}
 	}
-	
+
 	public void writeByte(byte x) {
 		//checkWritingBufferSize(1);
 		byteArray[writePosition++] = x;
@@ -96,7 +97,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 		byteArray[writePosition++] = (byte) (x >> 8);
 		byteArray[writePosition++] = (byte) x;
 	}
-	
+
 	public void writeFloat(float x) {
 		//checkWritingBufferSize(4);
 		int i = Float.floatToIntBits(x);
@@ -105,17 +106,17 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 		byteArray[writePosition++] = (byte) (i >> 8);
 		byteArray[writePosition++] = (byte) i;
 	}
-	
+
 	public void writeDouble(double x) {
 		//checkWritingBufferSize(8);
 		write(ByteBuffer.allocate(8).putDouble(x).array());
 	}
-	
+
 	public void writeLong(long x) {
 		//checkWritingBufferSize(8);
 		write(ByteBuffer.allocate(8).putLong(x).array());
 	}
-	
+
 	public void writeInt(int x) {
 		//checkWritingBufferSize(4);
 		byteArray[writePosition++] = (byte) (x >> 24);
@@ -135,7 +136,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 	public byte[] getByteArray(){
 		return byteArray;
 	}
-	
+
 	public static int getAllocatedStringSize(String s){
 		return s.length() + 1;
 	}
@@ -145,7 +146,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 		writePosition = 0;
 		readPosition = 0;
 	}
-	
+
 	/*private void checkWritingBufferSize(int required) {
 		if(required + writePosition > byteArray.length){
 			throw new BufferOutOfBoundsException("Not enoguh space while writing on the buffer! Required: " + (required + writePosition) + ", Allocated: " + byteArray.length);
@@ -157,7 +158,7 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 			throw new BufferOutOfBoundsException("Not enough space while reading from the buffer!");
 		}
 	}*/
-	
+
 	public void writeToStream(OutputStream out){
 		try {
 			out.write(byteArray.length);
@@ -167,8 +168,8 @@ public class DataBuffer implements IInputBuffer, IOutputBuffer{
 			e.printStackTrace();
 		}
 	}
-	
-	public static DataBuffer readFromStream(InputStream in){
+
+	public static DataBuffer readFromStream(InputStream in) {
 		try {
 			int size = in.read();
 			byte[] array = new byte[size];
