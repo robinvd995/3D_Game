@@ -8,7 +8,7 @@ import game.common.world.World;
 
 public class Block {
 
-	public static final int BLOCK_AMOUNT = 5;
+	public static final int BLOCK_AMOUNT = 6;
 	
 	private static final Block[] BLOCKS = new Block[BLOCK_AMOUNT];
 	
@@ -17,6 +17,7 @@ public class Block {
 	public static final Block WATER = new BlockWater(2).setUnlocalizedName("water");
 	public static final Block STONE = new Block(3).setUnlocalizedName("stone");
 	public static final Block SAND = new Block(4).setUnlocalizedName("sand");
+	public static final Block GOLD_ORE = new Block(5).setUnlocalizedName("gold_ore");
 	
 	private Vector3f blockColor = new Vector3f(1.0f, 1.0f, 1.0f);
 	
@@ -24,6 +25,8 @@ public class Block {
 	
 	private final int blockId;
 	private String unlocalizedName;
+	
+	private AxisAlignedBB bounds = new AxisAlignedBB(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 	
 	public Block(int id){
 		blockId = id;
@@ -44,6 +47,10 @@ public class Block {
 		return this;
 	}
 	
+	public final boolean needsRendering(){
+		return needsRendering;
+	}
+	
 	public boolean shouldBlockBeRendered(World world, BlockPos pos){
 		if(!needsRendering){
 			return false;
@@ -56,10 +63,6 @@ public class Block {
 	
 	public int getBlockId(){
 		return blockId;
-	}
-
-	public AxisAlignedBB getBoundingBox(){
-		return new AxisAlignedBB(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f);
 	}
 	
 	public boolean isFullCube(){
@@ -78,6 +81,14 @@ public class Block {
 		return result;
 	}
 	
+	public void setBounds(float minx, float miny, float minz, float maxx, float maxy, float maxz){
+		this.bounds = new AxisAlignedBB(minx, miny, minz, maxx, maxy, maxz);
+	}
+	
+	public AxisAlignedBB getBounds(World world, BlockPos pos){
+		return bounds;
+	}
+	
 	public static Block getBlockFromId(int id){
 		return id < BLOCKS.length ? BLOCKS[id] : AIR;
 	}
@@ -91,6 +102,11 @@ public class Block {
 		return this;
 	}
 	
+	@Override
+	public String toString() {
+		return "Block [blockId=" + blockId + ", unlocalizedName=" + unlocalizedName + "]";
+	}
+
 	public boolean shouldRenderSide(World world, BlockPos pos, EnumDirection side){
 		Block block = world.getBlock(pos.move(side));
 		return !block.isFullCube() || block.isTransparantBlock();

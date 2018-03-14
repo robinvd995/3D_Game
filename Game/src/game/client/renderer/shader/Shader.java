@@ -72,6 +72,11 @@ public class Shader {
 		System.out.println("Loading uniform " + uniformName);
 	}
 	
+	public void loadInt(String uniform, int value){
+		int location = uniformMap.get(uniform);
+		GL20.glUniform1i(location, value);
+	}
+	
 	public void loadFloat(String uniform, float value){
 		int location = uniformMap.get(uniform);
 		GL20.glUniform1f(location, value);

@@ -1,4 +1,4 @@
-package game.common.world;
+/*package game.client.renderer.world;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import game.client.renderer.block.BlockRenderData;
 import game.client.renderer.block.BlockRenderRegistry;
 import game.common.block.Block;
 import game.common.util.BlockPos;
+import game.common.world.World;
 
 public class ClientWorld {
 
@@ -33,9 +34,9 @@ public class ClientWorld {
 		blocksToRender.clear();
 		modelsToRender.clear();
 		
-		int maxX = world.getMaxX();
-		int maxY = world.getMaxY();
-		int maxZ = world.getMaxZ();
+		int maxX = 64;
+		int maxY = 64;
+		int maxZ = 64;
 		
 		for(int i = 0; i < maxX; i++){
 			for(int j = 0; j < maxY; j++){
@@ -85,3 +86,4 @@ public class ClientWorld {
 		return transparent ? transparentModelsToRender.get(model) : modelsToRender.get(model);
 	}
 }
+*/

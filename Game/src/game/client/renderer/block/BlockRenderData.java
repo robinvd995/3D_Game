@@ -1,75 +1,47 @@
 package game.client.renderer.block;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 
-import com.google.gson.Gson;
-
 import game.common.block.Block;
-import game.common.util.EnumDirection;
+import game.common.json.JsonLoader;
 
 public class BlockRenderData {
 
-	private String model;
-	private HashMap<String,BlockRenderPart> parts;
+	private String renderer;
+	private HashMap<String,String> textures;
 	
 	private BlockRenderData(){}
 	
-	@Override
-	public String toString() {
-		return "BlockRenderData [model=" + model + ", parts=" + parts + "]";
+	public String getTexture(String key){
+		return textures.get(key);
 	}
 	
-	public final String getModel(){
-		return model;
+	@Override
+	public String toString() {
+		return "BlockRenderData [model=" + renderer + ", data=" + textures + "]";
+	}
+	
+	public final String getRenderer(){
+		return renderer;
+	}
+	
+	public Collection<String> getTextures(){
+		return textures.values();
 	}
 
 	public static BlockRenderData from(Block block){
-		String path = "res/blocks/" + block.getUnlocalizedName() + ".json";
-		File file = new File(path);
-		BufferedReader reader = null;
+		String path = "res/blocks/" + block.getUnlocalizedName();
+		BlockRenderData data = new BlockRenderData();
 		try {
-			reader = new BufferedReader(new FileReader(file));
+			data = JsonLoader.loadClassFromJson(path, BlockRenderData.class);
 		} catch (FileNotFoundException e) {
 			System.err.println("Could not find block render data for block " + block.getUnlocalizedName() + ", this block will not be rendered!");
+		} catch (IOException e) {
+			System.err.println("Failed to parse the render data for block " + block.getUnlocalizedName() + ", this block will not be rendered!");
 		}
-		
-		String jsonData = "";
-		if(reader != null){
-			String line = "";
-			try {
-				while((line = reader.readLine()) != null){
-					jsonData = jsonData + line.trim();
-				}
-			} catch (IOException e) {
-				System.err.println("Failed to parse the render data for block " + block.getUnlocalizedName() + ", this block will not be rendered!");
-			}
-		}
-		
-		Gson gson = new Gson();
-		BlockRenderData data = gson.fromJson(jsonData, BlockRenderData.class);
 		return data;
-	}
-	
-	public BlockRenderPart getRenderPartFromSide(EnumDirection side){
-		return parts.get(side.getUnlocalizedName());
-	}
-	
-	public static class BlockRenderPart{
-		
-		private String texture;
-		
-		@Override
-		public String toString() {
-			return "BlockRenderPart [texture=" + texture + "]";
-		}
-		
-		public String getTexture(){
-			return texture;
-		}
 	}
 }

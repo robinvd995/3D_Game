@@ -1,4 +1,6 @@
-package game.common.world;
+package game.common.world.cluster;
+
+import game.common.util.BlockPos;
 
 public class ClusterPosition {
 
@@ -10,6 +12,12 @@ public class ClusterPosition {
 		this.posX = x;
 		this.posY = y;
 		this.posZ = z;
+	}
+	
+	public ClusterPosition(BlockPos pos){
+		this.posX = Math.floorDiv(pos.getX(), Cluster.CLUSTER_SIZE);
+		this.posY = Math.floorDiv(pos.getY(), Cluster.CLUSTER_SIZE);
+		this.posZ = Math.floorDiv(pos.getZ(), Cluster.CLUSTER_SIZE);
 	}
 	
 	public int getPosX(){
@@ -24,14 +32,28 @@ public class ClusterPosition {
 		return posZ;
 	}
 
+	public BlockPos getWorldCoords(int x, int y, int z){
+		int nx = (posX * Cluster.CLUSTER_SIZE) + x;
+		int ny = (posY * Cluster.CLUSTER_SIZE) + y;
+		int nz = (posZ * Cluster.CLUSTER_SIZE) + z;
+		return new BlockPos(nx, ny, nz);
+	}
+	
+	@Override
+	public String toString() {
+		return "ClusterPosition [posX=" + posX + ", posY=" + posY + ", posZ=" + posZ + "]";
+	}
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
+		/*final int prime = 31;
 		int result = 1;
 		result = prime * result + posX;
 		result = prime * result + posY;
 		result = prime * result + posZ;
-		return result;
+		return result;*/
+		String hashString = posX + "," + posY + "," + posZ;
+		return hashString.hashCode();
 	}
 
 	@Override

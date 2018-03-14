@@ -1,6 +1,8 @@
 package game.common.block;
 
 import game.common.physics.AxisAlignedBB;
+import game.common.util.BlockPos;
+import game.common.world.World;
 
 public class BlockAir extends Block{
 
@@ -14,7 +16,7 @@ public class BlockAir extends Block{
 	}
 	
 	@Override
-	public AxisAlignedBB getBoundingBox(){
+	public AxisAlignedBB getBounds(World world, BlockPos pos){
 		return null;
 	}
 }

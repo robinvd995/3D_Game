@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class NoiseGenerator {
 	
-	public static float[][] generateWhiteNoise(Random rand, int width, int height){
+	public static float[][] generateWhiteNoise(Random rand, int x, int y, int width, int height){
 		float[][] noise = new float[width][height];
 
 		for(int i = 0; i < width; i++){
@@ -89,14 +89,14 @@ public class NoiseGenerator {
 		return (1 - alpha) * x0 + alpha * x1;
 	}
 	
-	public static float[][] generatePerlinNoise(Random rand, int width, int height, int octaves){
-		float[][] whiteNoise = generateWhiteNoise(rand, width, height);
+	public static float[][] generatePerlinNoise(Random rand, int x, int y, int width, int height, int octaves){
+		float[][] whiteNoise = generateWhiteNoise(rand, x, y, width, height);
 		float[][] perlinNoise = generatePerlinNoise(rand, whiteNoise, octaves);
 		return perlinNoise;
 	}
 	
-	public static float[][] generateSmoothNoise(Random rand, int width, int height){
-		float[][] whiteNoise = generateWhiteNoise(rand, width, height);
+	public static float[][] generateSmoothNoise(Random rand, int x, int y, int width, int height){
+		float[][] whiteNoise = generateWhiteNoise(rand, x, y, width, height);
 		float[][] smoothNoise = generatePerlinNoise(rand, whiteNoise, 1);
 		return smoothNoise;
 	}

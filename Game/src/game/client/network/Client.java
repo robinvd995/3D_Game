@@ -72,6 +72,11 @@ public class Client {
 				packet.execute(this);
 			}
 		}
+		else{
+			connection = null;
+			theClient = null;
+			packetManager = null;
+		}
 	}
 
 	public static synchronized ConnectionStatus getConnectionStatus(){
@@ -88,7 +93,9 @@ public class Client {
 
 	public static void stopClient(){
 		System.out.println("Stopping client!");
-		theClient.connection.closeConnection();
+		if(theClient != null){
+			theClient.connection.closeConnection();
+		}
 	}
 
 	public static boolean hasClient(){

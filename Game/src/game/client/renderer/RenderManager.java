@@ -1,41 +1,33 @@
 package game.client.renderer;
 
-import static org.lwjgl.opengl.GL11.GL_BACK;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glCullFace;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.*;
 
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
 
 import caesar.util.Matrix4f;
-import caesar.util.Vector3f;
-import game.client.renderer.block.BlockRenderManager;
-import game.client.renderer.block.BlockRenderRegistry;
+//import game.client.renderer.block.BlockRenderManager;
 import game.client.renderer.entity.EntityRenderManager;
 import game.client.renderer.gui.GuiRenderManager;
 import game.client.renderer.model.ModelLoader;
 import game.client.renderer.texture.TextureManager;
-import game.client.renderer.world.SkyboxRenderManager;
-import game.common.world.ClientWorld;
+import game.client.renderer.world.ClusterRenderManager;
+import game.client.renderer.world.SkyRenderManager;
+import game.client.renderer.world.WorldClient;
 
 public class RenderManager {
 
-	private BlockRenderManager blockRenderer;
+	//private BlockRenderManager blockRenderer;
+	private ClusterRenderManager clusterRenderer;
 	private EntityRenderManager entityRenderer;
 	private GuiRenderManager guiRenderer;
-	private SkyboxRenderManager skyboxRenderer;
+	private SkyRenderManager skyboxRenderer;
 	
 	public RenderManager(){
-		blockRenderer = new BlockRenderManager();
+		//blockRenderer = new BlockRenderManager();
+		clusterRenderer = new ClusterRenderManager();
 		entityRenderer = new EntityRenderManager();
 		guiRenderer = new GuiRenderManager();
-		skyboxRenderer = new SkyboxRenderManager();
+		skyboxRenderer = new SkyRenderManager();
 		DebugRenderer.INSTANCE.init();
 	}
 
@@ -44,11 +36,14 @@ public class RenderManager {
 	}
 	
 	public void initRenderer(){
-		BlockRenderRegistry.loadAllRenderData();
-		TextureManager.loadAllTextures();
+		//BlockRenderRegistry.loadAllRenderData();
+		RenderRegistry.registerBlockRenderers();
+		RenderRegistry.loadBlockRenderData();
+		TextureManager.loadBlockTextures();
 		
+		clusterRenderer.initRenderer();
 		entityRenderer.initRenderer();
-		blockRenderer.initRenderer();
+		//blockRenderer.initRenderer();
 		guiRenderer.initRenderer();
 		skyboxRenderer.initRenderer();
 	}
@@ -60,21 +55,24 @@ public class RenderManager {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	public void renderWorld(Camera camera, ClientWorld world, double delta, Vector3f lightDir){
+	public void renderWorld(Camera camera, WorldClient world, double delta){
 		Matrix4f viewMatrix = camera.createViewMatrix();
 		
 		skyboxRenderer.renderSkybox(viewMatrix);
+		skyboxRenderer.renderSun(world, viewMatrix);
 		
-		blockRenderer.prepare(lightDir, viewMatrix);
+		clusterRenderer.prepare(world, viewMatrix);
+		clusterRenderer.renderBlocks(world);
+		clusterRenderer.end();
+		
+		/*blockRenderer.prepare(lightDir, viewMatrix);
 		blockRenderer.renderBlocks(world, false);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		blockRenderer.renderBlocks(world, true);
-		GL11.glDisable(GL11.GL_BLEND);
-		blockRenderer.end();
 		
-		entityRenderer.prepare(lightDir, viewMatrix);
-		entityRenderer.renderEntity(world.getWorldObj(), world.getWorldObj().getPlayer());
+		blockRenderer.renderBlocks(world, true);
+		blockRenderer.end();*/
+		
+		entityRenderer.prepare(world, viewMatrix);
+		entityRenderer.renderEntity(world, world.getPlayer());
 		entityRenderer.end();
 		
 		DebugRenderer.INSTANCE.prepare(viewMatrix);

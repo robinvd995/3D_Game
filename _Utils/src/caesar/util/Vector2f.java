@@ -72,4 +72,43 @@ public class Vector2f {
 		this.y = y;
 		return this;
 	}
+	
+	public Vector2f sub(Vector2f other){
+		float x = getX() - other.getX();
+		float y = getY() - other.getY();
+		set(x, y);
+		return this;
+	}
+	
+	public Vector2f add(Vector2f other){
+		float x = getX() + other.getX();
+		float y = getY() + other.getY();
+		set(x, y);
+		return this;
+	}
+	
+	public Vector2f mult(Vector2f other){
+		float x = getX() * other.getX();
+		float y = getY() * other.getY();
+		set(x, y);
+		return this;
+	}
+	
+	public static Vector2f sub(Vector2f vec0, Vector2f vec1){
+		Vector2f result = vec0.copy();
+		result.sub(vec1);
+		return result;
+	}
+	
+	public static Vector2f add(Vector2f vec0, Vector2f vec1){
+		Vector2f result = vec0.copy();
+		result.add(vec1);
+		return result;
+	}
+	
+	public static Vector2f mult(Vector2f vec0, Vector2f vec1){
+		Vector2f result = vec0.copy();
+		result.mult(vec1);
+		return result;
+	}
 }

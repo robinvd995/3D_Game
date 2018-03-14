@@ -1,12 +1,10 @@
 package game.client;
 
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.*;
 
 import com.google.common.eventbus.Subscribe;
 
+import game.client.audio.AudioManager;
 import game.client.display.DisplayManager;
 import game.client.input.InputManager;
 import game.client.network.Client;
@@ -56,6 +54,8 @@ public class Game {
 		scene = new SceneMenu();
 		scene.initScene();
 		
+		AudioManager.init();
+		
 		EventManager.registerEventListener(INSTANCE);
 	}
 
@@ -84,6 +84,8 @@ public class Game {
 	protected void close(){
 		renderer.cleanUp();
 		scene.closeScene();
+		
+		AudioManager.cleanUp();
 		
 		Client.stopClient();
 	}

@@ -13,6 +13,14 @@ public class Vector4f extends Vector3f{
 		this(f, f, f, f);
 	}
 	
+	public Vector4f(Vector2f vec, float z, float w){
+		this(vec.getX(), vec.getY(), z, w);
+	}
+	
+	public Vector4f(Vector3f vec, float w){
+		this(vec.getX(), vec.getY(), vec.getZ(), w);
+	}
+	
 	public Vector4f(float x, float y, float z, float w) {
 		super(x, y, z);
 		this.w = w;

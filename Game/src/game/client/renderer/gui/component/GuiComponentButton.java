@@ -3,6 +3,8 @@ package game.client.renderer.gui.component;
 import org.lwjgl.opengl.GL11;
 
 import caesar.util.Vector4f;
+import game.client.audio.AudioManager;
+import game.client.audio.SimpleAudioSource;
 import game.client.renderer.gui.Gui;
 import game.client.renderer.gui.GuiAnchor;
 import game.client.renderer.gui.font.Font;
@@ -134,6 +136,7 @@ public class GuiComponentButton implements IGuiRenderComponent, IGuiTextComponen
 			boolean inRange = mouseX > posX && mouseX < posX + buttonWidth && mouseY > posY && mouseY < posY + buttonHeight;
 			if(inRange){
 				setButtonState(BUTTON_STATE_HOVER);
+				gui.playSound("snap");
 				gui.actionPerformed(this, this.action);
 			}
 			else{

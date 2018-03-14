@@ -8,6 +8,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import caesar.util.Vector2f;
+import game.client.audio.SimpleAudioSource;
 import game.client.renderer.gui.component.IGuiCharInput;
 import game.client.renderer.gui.component.IGuiComponent;
 import game.client.renderer.gui.component.IGuiKeyInput;
@@ -59,6 +60,8 @@ public abstract class Gui {
 
 	private boolean isActive = false;
 	
+	private SimpleAudioSource audioSource;
+	
 	private Gui(){
 		this.components = new ArrayList<IGuiComponent>();
 		this.textComponents = new ArrayList<IGuiTextComponent>();
@@ -89,6 +92,7 @@ public abstract class Gui {
 		sortComponents();
 		this.frameBuffer = GuiFrameBuffer.createFrameBuffer(this);
 		this.guiQuad = createGuiQuad(0, 0, guiWidth, guiHeight, 0, 0, guiWidth, guiHeight, width, height);
+		this.audioSource = new SimpleAudioSource();
 		isInitialized = true;
 	}
 
@@ -343,6 +347,7 @@ public abstract class Gui {
 		keyInputComponents.clear();
 		charInputComponents.clear();
 		isInitialized = false;
+		audioSource.delete();
 	}
 
 	public void bindTexture(TextureData textureData){
@@ -517,5 +522,9 @@ public abstract class Gui {
 	
 	public String toString(){
 		return "Gui[" + this.getGuiId() + ", " + this.getGuiLayer() + "]";
+	}
+	
+	public void playSound(String sound){
+		audioSource.playSound(sound);
 	}
 }

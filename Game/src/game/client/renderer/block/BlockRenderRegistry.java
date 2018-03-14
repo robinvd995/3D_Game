@@ -1,4 +1,4 @@
-package game.client.renderer.block;
+/*package game.client.renderer.block;
 
 import java.io.File;
 import java.util.HashMap;
@@ -20,11 +20,6 @@ public class BlockRenderRegistry {
 	public static void loadAllRenderData(){
 		loadAllBlockRenderData();
 		loadAllBlockModels();
-		loadAllBlockTextures();
-	}
-
-	private static void loadAllBlockTextures() {
-		
 	}
 
 	private static void loadAllBlockModels() {
@@ -88,4 +83,4 @@ public class BlockRenderRegistry {
 	public static LoadedModel getModel(String model){
 		return blockModelMap.get(model);
 	}
-}
+}*/

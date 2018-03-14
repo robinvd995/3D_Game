@@ -3,6 +3,7 @@ package game.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 import game.server.io.Logger;
 
@@ -34,22 +35,31 @@ public class ConnectionListener extends Thread{
 		Logger.logInfo("Started Listening for clients!");
 		while(isRunning){
 			try {
-				Socket clientSocket = socket.accept();
-				Logger.logInfo("Client trying to connect...");
-				Server.INSTANCE.addClientToConnect(clientSocket);
-			} catch (IOException e) {
+				listenToClient();
+			} catch (SocketException e) {
 				e.printStackTrace();
 			}
 		}
 		
+		System.out.println("Closing client listener!");
+	}
+	
+	private void listenToClient() throws SocketException{
+		Socket clientSocket;
+		try {
+			clientSocket = socket.accept();
+			Logger.logInfo("Client trying to connect...");
+			Server.INSTANCE.addClientToConnect(clientSocket);
+		} catch (IOException e) {}
+	}
+	
+	public void stopListening(){
+		System.out.println("Stopping!");
+		isRunning = false;
 		try {
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public void stopListening(){
-		isRunning = false;
 	}
 }

@@ -54,6 +54,13 @@ public class ShaderBuilder {
 			BufferedReader reader = new BufferedReader(new FileReader(file + ".frag"));
 			String line;
 			while((line = reader.readLine()) != null){
+				
+				if(line.startsWith("uniform")){
+					String[] lineSegments = line.split(" ");
+					String uniformName = lineSegments[2].replaceAll(";", "");
+					uniformValues.add(uniformName);
+				}
+				
 				builder.append(line).append("\n");
 			}
 			reader.close();

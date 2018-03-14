@@ -1,4 +1,4 @@
-package game.client.renderer.block;
+/*package game.client.renderer.block;
 
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -9,9 +9,9 @@ import game.client.display.DisplayManager;
 import game.client.renderer.model.LoadedModel;
 import game.client.renderer.shader.BlockShader;
 import game.client.renderer.texture.TextureManager;
+import game.client.renderer.world.ClientWorld;
 import game.common.block.Block;
 import game.common.util.BlockPos;
-import game.common.world.ClientWorld;
 
 public class BlockRenderManager {
 	
@@ -68,4 +68,4 @@ public class BlockRenderManager {
 	public void end(){
 		shader.stop();
 	}
-}
+}*/

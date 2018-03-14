@@ -1,0 +1,6 @@
+{
+	"renderer": "cube",
+	"textures":{
+		"texture": "gold_ore"
+	}
+}

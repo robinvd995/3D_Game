@@ -69,6 +69,7 @@ public class Configuration {
 				writeLine(writer, line);
 			}
 			writeLine(writer, "}");
+			writeLine(writer,"");
 		}
 		
 		try {
@@ -99,7 +100,6 @@ public class Configuration {
 		String currentCategory = null;
 		String line;
 		while((line = readNextLine(reader)) != null){
-			line = line.trim();
 			
 			if(line.endsWith("{")){
 
@@ -133,8 +133,10 @@ public class Configuration {
 
 	private static String readNextLine(BufferedReader reader){
 		try {
-			return reader.readLine();
+			return reader.readLine().trim();
 		} catch (IOException e) {
+			return null;
+		} catch (NullPointerException e){
 			return null;
 		}
 	}

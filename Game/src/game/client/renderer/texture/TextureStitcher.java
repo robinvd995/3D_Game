@@ -9,26 +9,26 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 
 public class TextureStitcher {
 
 	public static final int TEXTURE_DIMENSIONS = 256;
-	
+
 	private static final int TEXTURE_SPOT_SIZE = 32;
-	
-	public static StitchResult stitchTextures(String filePath, String fileExtension, Set<String> textures){
-		
+
+	public static StitchResult stitchTextures(String filePath, String fileExtension, List<String> textures, boolean mapTextures){
+
 		Queue<StitchEntry> stitchEntries = new PriorityQueue<StitchEntry>();
-		
+
 		int currentSpotsOccupied = 0;
-		
+
 		for(String texture : textures){
 			String textureFilePath = filePath + texture + "." + fileExtension;
 			File textureFile = new File(textureFilePath);
 			try {
+				System.out.println(textureFilePath);
 				BufferedImage image = ImageIO.read(textureFile);
 				int width = image.getWidth();
 				int height = image.getHeight();
@@ -47,12 +47,12 @@ public class TextureStitcher {
 				e.printStackTrace();
 			}
 		}
-		
+
 		BufferedImage stitchedTexture  = new BufferedImage(TEXTURE_DIMENSIONS, TEXTURE_DIMENSIONS, BufferedImage.TYPE_INT_ARGB);
 		LinkedList<TexturePosition> freeTextureSlots = createEmptyTextureRoster();
-		
+
 		StitchResult result = new StitchResult();
-		
+
 		while(!stitchEntries.isEmpty()){
 			StitchEntry entry = stitchEntries.poll();
 			TexturePosition pos = findSpot(entry.spotsNeeded, freeTextureSlots);
@@ -60,7 +60,7 @@ public class TextureStitcher {
 				System.out.println("Could not find spot!");
 				continue;
 			}
-			
+
 			int imgWidth = entry.image.getWidth();
 			int imgHeight = entry.image.getHeight();
 			for(int i = 0; i < imgWidth; i++){
@@ -71,26 +71,29 @@ public class TextureStitcher {
 					stitchedTexture.setRGB(texturePosX, texturePosY, rgb);
 				}
 			}
-			
-			float texPosX = (float)(pos.posX * TEXTURE_SPOT_SIZE) / (float)TEXTURE_DIMENSIONS;
-			float texPosY = (float)(pos.posY * TEXTURE_SPOT_SIZE) / (float)TEXTURE_DIMENSIONS;
-			float width = (float)(entry.spotsNeeded * TEXTURE_SPOT_SIZE) / (float)TEXTURE_DIMENSIONS;
-			float height = (float)(entry.spotsNeeded * TEXTURE_SPOT_SIZE) / (float)TEXTURE_DIMENSIONS;
-			MappedTexture mappedTexture = new MappedTexture(texPosX, texPosY, width, height);
-			result.textures.put(entry.texture, mappedTexture);
+
+			if(mapTextures){
+				float texPosX = (float)(pos.posX * TEXTURE_SPOT_SIZE) / (float)TEXTURE_DIMENSIONS;
+				float texPosY = (float)(pos.posY * TEXTURE_SPOT_SIZE) / (float)TEXTURE_DIMENSIONS;
+				float width = (float)(entry.spotsNeeded * TEXTURE_SPOT_SIZE) / (float)TEXTURE_DIMENSIONS;
+				float height = (float)(entry.spotsNeeded * TEXTURE_SPOT_SIZE) / (float)TEXTURE_DIMENSIONS;
+				MappedTexture mappedTexture = new MappedTexture(texPosX, texPosY, width, height);
+				result.textures.put(entry.texture, mappedTexture);
+			}
 		}
-		
+
 		result.image = stitchedTexture;
-		
+
 		try {
-			ImageIO.write(stitchedTexture, "png", new File("StitchedTexture.png"));
+			String flp = filePath.substring(filePath.length() - 5, filePath.length() - 1) + ".png";
+			ImageIO.write(stitchedTexture, "png", new File(flp));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
-	
+
 	private static TexturePosition findSpot(int spotsNeeded, LinkedList<TexturePosition> freeTextureSlots){
 		System.out.println(spotsNeeded);
 		if(spotsNeeded == 1){
@@ -109,7 +112,7 @@ public class TextureStitcher {
 			return null;
 		}
 	}
-	
+
 	private static boolean isSpaceFree(LinkedList<TexturePosition> freeTextureSlots, int x, int y, int w, int h){
 		List<TexturePosition> list = new ArrayList<TexturePosition>();
 		for(int i = 0; i < w; i++){
@@ -124,7 +127,7 @@ public class TextureStitcher {
 		freeTextureSlots.removeAll(freeTextureSlots);
 		return true;
 	}
-	
+
 	private static LinkedList<TexturePosition> createEmptyTextureRoster(){
 		LinkedList<TexturePosition> list = new LinkedList<TexturePosition>();
 		int size = TEXTURE_DIMENSIONS / TEXTURE_SPOT_SIZE;
@@ -135,50 +138,50 @@ public class TextureStitcher {
 		}
 		return list;
 	}
-	
+
 	public static class StitchResult {
-		
+
 		private BufferedImage image;
 		private HashMap<String,MappedTexture> textures;
-		
+
 		private StitchResult(){
 			textures = new HashMap<String,MappedTexture>();
 		}
-		
+
 		public BufferedImage getImage(){
 			return image;
 		}
-		
+
 		public HashMap<String,MappedTexture> getTextures(){
 			return textures;
 		}
 	}
-	
+
 	private static class TexturePosition {
-		
+
 		private int posX;
 		private int posY;
-		
+
 		public TexturePosition(int x, int y){
 			this.posX = x;
 			this.posY = y;
 		}
-		
+
 		public boolean equals(Object o){
 			return o instanceof TexturePosition ? equals((TexturePosition) o) : false;
 		}
-		
+
 		public boolean equals(TexturePosition other){
 			return posX == other.posX && posY == other.posY;
 		}
 	}
-	
+
 	private static class StitchEntry implements Comparable<StitchEntry>{
-		
+
 		private BufferedImage image;
 		private String texture;
 		private int spotsNeeded;
-		
+
 		public StitchEntry(BufferedImage image, String texture, int spotsNeeded){
 			this.image = image;
 			this.texture = texture;

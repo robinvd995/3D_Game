@@ -24,6 +24,14 @@ public class MappedTexture {
 		return textureCoordY;
 	}
 	
+	public float getMaxU(){
+		return textureCoordX + width;
+	}
+	
+	public float getMaxV(){
+		return textureCoordY + height;
+	}
+	
 	public float getWidth(){
 		return width;
 	}

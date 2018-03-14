@@ -47,4 +47,13 @@ public class GeometryBuilder {
 			     size, -size,  size
 		};
 	}
+	
+	public static float[] buildCenteredQuad(float size){
+		return new float[]{
+			-size, size,
+			-size, -size,
+			size, size,
+			size, -size
+		};
+	}
 }

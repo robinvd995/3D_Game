@@ -11,6 +11,8 @@ import game.common.physics.RayAABBResult;
 import game.common.util.BlockPos;
 import game.common.util.EnumDirection;
 import game.common.world.World;
+import game.common.world.cluster.Cluster;
+import game.common.world.cluster.ClusterPosition;
 
 public class Entity {
 
@@ -50,6 +52,13 @@ public class Entity {
 		Ray ray = new Ray(transform.getPosition(), transform.getOrientation(), 10.0f);
 		DebugRenderer.INSTANCE.addObjectToRender(new DebugRay(ray));
 
+		int minX = (int) Math.floor(transform.getPosition().getX() + aabb.getMinX());
+		int maxX = (int) Math.ceil(transform.getPosition().getX() + aabb.getMaxX());
+		int minY = (int) Math.floor(transform.getPosition().getY() + aabb.getMinY());
+		int maxY = (int) Math.ceil(transform.getPosition().getY() + aabb.getMaxY());
+		int minZ = (int) Math.floor(transform.getPosition().getZ() + aabb.getMinZ());
+		int maxZ = (int) Math.ceil(transform.getPosition().getZ() + aabb.getMaxZ());
+		
 		/*for(int x = 0; x < world.getMaxX(); x++){
 			for(int y = 0; y < world.getMaxY(); y++){
 				for(int z = 0; z < world.getMaxZ(); z++){
@@ -67,7 +76,7 @@ public class Entity {
 		}*/
 
 		//Collision
-		int minX = (int) Math.floor(transform.getPosition().getX() + aabb.getMinX());
+		/*int minX = (int) Math.floor(transform.getPosition().getX() + aabb.getMinX());
 		int maxX = (int) Math.ceil(transform.getPosition().getX() + aabb.getMaxX());
 		int minY = (int) Math.floor(transform.getPosition().getY() + aabb.getMinY());
 		int maxY = (int) Math.ceil(transform.getPosition().getY() + aabb.getMaxY());
@@ -172,10 +181,10 @@ public class Entity {
 							transform.getPosition().setY(otherAABB.getMaxY() + otherPos.getY()
 							);
 						}*/
-					}
+					/*}
 				}
 			}
-
+			
 			if(!collidedWithYMin){
 				isGrounded = false;
 			}
@@ -183,7 +192,7 @@ public class Entity {
 
 		velocity = transform.getPosition().copy().min(lastPosition);
 		DebugRenderer.INSTANCE.addObjectToRender(new DebugAxisAlignedBB(aabb, transform.getPosition()));
-		DebugRenderer.INSTANCE.addObjectToRender(new DebugPosition(transform.getPosition()));
+		DebugRenderer.INSTANCE.addObjectToRender(new DebugPosition(transform.getPosition()));*/
 	}
 
 	public void jump(float jumpStrength){
@@ -207,5 +216,12 @@ public class Entity {
 
 	public AxisAlignedBB getBoundingBox(){
 		return aabb;
+	}
+	
+	public ClusterPosition getClusterCoords(){
+		int x = ((int)transform.getPosition().getX()) / Cluster.CLUSTER_SIZE;
+		int y = ((int)transform.getPosition().getY()) / Cluster.CLUSTER_SIZE;
+		int z = ((int)transform.getPosition().getZ()) / Cluster.CLUSTER_SIZE;
+		return new ClusterPosition(x, y, z);
 	}
 }

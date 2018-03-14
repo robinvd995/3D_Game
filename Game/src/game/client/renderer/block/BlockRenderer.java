@@ -1,4 +1,4 @@
-package game.client.renderer.block;
+/*package game.client.renderer.block;
 
 import caesar.util.MathHelper;
 import caesar.util.Matrix4f;
@@ -38,3 +38,4 @@ public class BlockRenderer {
 		
 	}
 }
+*/

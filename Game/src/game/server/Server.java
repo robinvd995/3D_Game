@@ -14,6 +14,7 @@ import game.common.network.packet.PacketManager;
 import game.server.command.CommandContainer;
 import game.server.command.CommandListener;
 import game.server.command.CommandManager;
+import game.server.event.ServerStoppedEvent;
 import game.server.io.Logger;
 import game.server.network.packet.IServerPacket;
 import game.server.network.packet.ServerPacketChat;
@@ -130,15 +131,18 @@ public class Server {
 		return connectionMap.values();
 	}
 	
-	public void stopServer(){
+	public synchronized void stopServer(){
+		System.out.println("Stopping server!");
 		isRunning = false;
 	}
 
 	protected int stop(){
 		connectionListener.stopListening();
+		CommandListener.stopCommandListener();
 		for(ConnectionClient client : connectionMap.values()){
-			//client.stopConnection();
+			client.stopConnection();
 		}
+		EventManager.postEvent(new ServerStoppedEvent());
 		return 0;
 	}
 

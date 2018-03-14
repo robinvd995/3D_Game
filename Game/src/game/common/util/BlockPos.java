@@ -37,4 +37,9 @@ public class BlockPos {
 	public Vector3f toVector(){
 		return new Vector3f(x, y, z);
 	}
+
+	@Override
+	public String toString() {
+		return "BlockPos [x=" + x + ", y=" + y + ", z=" + z + "]";
+	}
 }

@@ -52,6 +52,10 @@ public class ConnectionClient {
 	public UUID getClientId(){
 		return clientId;
 	}
+	
+	public void stopConnection(){
+		connection.closeConnection();
+	}
 
 	/*public void stopConnection(){
 	System.out.println("Client disconnected!");

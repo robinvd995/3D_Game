@@ -30,6 +30,16 @@ public class Player extends Entity{
 		if(InputManager.isKeyDown(Key.DOWN)){
 			transform.translate(GlobalAxis.Z.toVector(), (float) (-movementSpeed * delta));
 		}
+		
+		if(InputManager.isKeyDown(Key.MOVE_UP)){
+			System.out.println("up");
+			transform.translate(GlobalAxis.Y.toVector(), (float) (movementSpeed * delta));
+		}
+		
+		if(InputManager.isKeyDown(Key.MOVE_DOWN)){
+			System.out.println("down");
+			transform.translate(GlobalAxis.Y.toVector(), (float) (-movementSpeed * delta));
+		}
 
 		if(InputManager.isKeyDown(Key.LEFT)){
 			transform.rotate(0.0f, (float) (rotationSpeed * delta), 0.0f);

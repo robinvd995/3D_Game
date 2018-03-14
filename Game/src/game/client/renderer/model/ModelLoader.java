@@ -107,6 +107,13 @@ public class ModelLoader {
 		return model;
 	}
 	
+	public SimpleModel loadSimpleQuad(float[] vertices){
+		int vao = createVAO();
+		SimpleModel model = new SimpleModel(vao, vertices.length / 2);
+		model.addVbo(storeDataInAttribList(0, 2, vertices));
+		return model;
+	}
+	
 	/*public LoadedModel loadAxisAlignedBBAsModel(AxisAlignedBB aabb){
 		
 		int vao = createVAO();
@@ -161,12 +168,16 @@ public class ModelLoader {
 		return id;
 	}
 
-	private int storeDataInAttribList(int attributeNumer, int coordinteSize, float[] data){
+	private int storeDataInAttribList(int attributeNumer, int coordinateSize, float[] data){
+		FloatBuffer buffer = storeDataInFloatBuffer(data);
+		return storeDataInAttribList(attributeNumer, coordinateSize, buffer);
+	}
+	
+	private int storeDataInAttribList(int attributeNumer, int coordinateSize, FloatBuffer buffer){
 		int vboID = GL15.glGenBuffers();
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
-		FloatBuffer buffer = storeDataInFloatBuffer(data);
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
-		GL20.glVertexAttribPointer(attributeNumer, coordinteSize, GL11.GL_FLOAT, false, 0, 0);
+		GL20.glVertexAttribPointer(attributeNumer, coordinateSize, GL11.GL_FLOAT, false, 0, 0);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 		return vboID;
 	}
@@ -186,9 +197,13 @@ public class ModelLoader {
 	}
 
 	private int bindIndicesBuffer(int[] indices){
+		IntBuffer buffer = storeDataInIntBuffer(indices);
+		return bindIndicesBuffer(buffer);
+	}
+	
+	private int bindIndicesBuffer(IntBuffer buffer){
 		int vbo = GL15.glGenBuffers();
 		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
-		IntBuffer buffer = storeDataInIntBuffer(indices);
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
 		return vbo;
 	}
@@ -208,7 +223,7 @@ public class ModelLoader {
 		return buffer;
 	}
 
-	public static FloatBuffer storeDataInFloatBuffer(float[] data){
+	public FloatBuffer storeDataInFloatBuffer(float[] data){
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
 		buffer.flip();

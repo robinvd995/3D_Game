@@ -1,11 +1,6 @@
 {
-	"model": "cube",
-	"parts":{
-		"up":{ "texture":"water" },
-		"down":{ "texture":"water" },
-		"left":{ "texture":"water" },
-		"right":{ "texture":"water" },
-		"front":{ "texture":"water" },
-		"back":{ "texture":"water" }
+	"renderer": "cube",
+	"textures":{
+		"texture": "water"
 	}
 }

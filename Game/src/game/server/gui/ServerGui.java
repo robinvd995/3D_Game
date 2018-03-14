@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.LinkedList;
 
 import javax.swing.AbstractAction;
@@ -29,10 +31,11 @@ import game.common.event.EventManager;
 import game.server.Server;
 import game.server.event.PlayerDisconnectEvent;
 import game.server.event.PlayerJoinedEvent;
+import game.server.event.ServerStoppedEvent;
 import game.server.io.IStreamListener;
 import game.server.io.Logger;
 
-public class ServerGui extends Thread {
+public class ServerGui extends Thread implements WindowListener{
 
 	private static final int MAX_COMMANDS = 10;
 	
@@ -72,10 +75,11 @@ public class ServerGui extends Thread {
 
 	private void init(){
 		frame = new JFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.setSize(1000, 600);
 		frame.setLocationRelativeTo(null);
 		frame.setTitle("Game Server 0.0.1");
+		frame.addWindowListener(this);
 
 		SpringLayout mainLayout = new SpringLayout();
 
@@ -296,6 +300,12 @@ public class ServerGui extends Thread {
 		updatePlayerList();
 	}
 	
+	@Subscribe 
+	public void onServerStopped(ServerStoppedEvent event){
+		System.out.println("Closing gui");
+		frame.dispose();
+	}
+	
 	private void updatePlayerList(){
 		playerListModel.clear();
 		for(String player : Server.INSTANCE.playerManager.getAllPlayers()){
@@ -353,4 +363,27 @@ public class ServerGui extends Thread {
 		public void keyTyped(KeyEvent e) {}
 
 	}
+
+	@Override
+	public void windowActivated(WindowEvent arg0) {}
+
+	@Override
+	public void windowClosed(WindowEvent arg0) {}
+
+	@Override
+	public void windowClosing(WindowEvent arg0) {
+		Server.INSTANCE.stopServer();
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent arg0) {}
+
+	@Override
+	public void windowDeiconified(WindowEvent arg0) {}
+
+	@Override
+	public void windowIconified(WindowEvent arg0) {}
+
+	@Override
+	public void windowOpened(WindowEvent arg0) {}
 }

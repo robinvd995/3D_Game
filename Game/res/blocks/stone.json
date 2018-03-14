@@ -1,11 +1,6 @@
 {
-	"model": "cube",
-	"parts":{
-		"up":{ "texture":"stone" },
-		"down":{ "texture":"stone" },
-		"left":{ "texture":"stone" },
-		"right":{ "texture":"stone" },
-		"front":{ "texture":"stone" },
-		"back":{ "texture":"stone" }
+	"renderer": "cube",
+	"textures":{
+		"texture": "stone"
 	}
 }

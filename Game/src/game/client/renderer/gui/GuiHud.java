@@ -31,7 +31,12 @@ public class GuiHud extends Gui {
 		this.addComponent(fpsCounter);
 		for(int i = 0; i < slotAmount; i++){
 			int posX = screenCenterX + ((i - offset) * 66);
-			this.addComponent(new GuiComponentHudTexture(this, posX, screenHeight - 66, 0, 0, 64, 0, 64, 64));
+			int u = 64;
+			if(i == 0){
+				u = 128;
+			}
+			this.addComponent(new GuiComponentHudTexture(this, posX, screenHeight - 66, 0, 0, u, 0, 64, 64));
+			this.addComponent(new GuiComponentText(this, String.valueOf((i + 1) % 10), "arial", posX + 32, screenHeight, GuiAnchor.BOTTOM, 0.5f));
 		}
 	}
 	
