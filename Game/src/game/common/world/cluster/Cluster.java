@@ -52,4 +52,17 @@ public class Cluster {
 	public ClusterPosition getPosition(){
 		return clusterPosition;
 	}
+	
+	public byte[] toByteArray(){
+		byte[] array = new byte[CLUSTER_SIZE * CLUSTER_SIZE * CLUSTER_SIZE];
+		for(int i = 0; i < CLUSTER_SIZE; i++){
+			for(int j =  0; j < CLUSTER_SIZE; j++){
+				for(int k = 0; k < CLUSTER_SIZE; k++){
+					int index = (i * CLUSTER_SIZE * CLUSTER_SIZE) + (j * CLUSTER_SIZE) + k;
+					array[index] = (byte) blocks[i][j][k].getBlockId();
+				}
+			}
+		}
+		return array;
+	}
 }

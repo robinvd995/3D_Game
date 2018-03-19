@@ -3,13 +3,10 @@ package game.common.entity;
 import caesar.util.Vector3f;
 import game.client.renderer.DebugRenderer;
 import game.client.renderer.debug.DebugAxisAlignedBB;
-import game.client.renderer.debug.DebugPosition;
 import game.client.renderer.debug.DebugRay;
 import game.common.physics.AxisAlignedBB;
 import game.common.physics.Ray;
-import game.common.physics.RayAABBResult;
 import game.common.util.BlockPos;
-import game.common.util.EnumDirection;
 import game.common.world.World;
 import game.common.world.cluster.Cluster;
 import game.common.world.cluster.ClusterPosition;
@@ -58,7 +55,54 @@ public class Entity {
 		int maxY = (int) Math.ceil(transform.getPosition().getY() + aabb.getMaxY());
 		int minZ = (int) Math.floor(transform.getPosition().getZ() + aabb.getMinZ());
 		int maxZ = (int) Math.ceil(transform.getPosition().getZ() + aabb.getMaxZ());
-		
+
+		for(int i = minX; i < maxX; i++){
+			for(int j = minY; j < maxY; j++){
+				for(int k = minZ; k < maxZ; k++){
+					BlockPos pos = new BlockPos(i, j, k);
+					AxisAlignedBB otherAABB = world.getBlock(pos).getBounds(world, pos);
+					if(otherAABB == null)
+						continue;
+
+					DebugRenderer.INSTANCE.addObjectToRender(new DebugAxisAlignedBB(otherAABB, pos.toVector()));
+
+					Vector3f myPos = transform.getPosition();
+					Vector3f otherPos = pos.toVector();
+
+					if(aabb.intersect(otherAABB, myPos, otherPos)){
+						
+						/*float relX = lastPosition.getX() - pos.getX();
+						float relZ = lastPosition.getZ() - pos.getZ();
+
+						EnumDirection leftRightSide = relX < 0 ? EnumDirection.LEFT : EnumDirection.RIGHT;
+						EnumDirection frontBackSide = relZ < 0 ? EnumDirection.BACK : EnumDirection.FRONT;
+
+						float correctedX = 0.0f;
+						float correctedZ = 0.0f;
+
+						if(leftRightSide == EnumDirection.LEFT){
+							correctedX = otherPos.getX() + otherAABB.getMinX() - aabb.getMaxX();
+							System.out.println("left");
+						}
+						else{
+							correctedX = otherPos.getX() + otherAABB.getMaxX() - aabb.getMinX();
+							System.out.println("right");
+						}
+
+						if(frontBackSide == EnumDirection.BACK){
+
+						}
+						else{
+							
+						}*/
+						
+						//transform.getPosition().set(lastPosition.getX(), lastPosition.getY(), lastPosition.getZ());
+					}
+					
+				}
+			}
+		}
+
 		/*for(int x = 0; x < world.getMaxX(); x++){
 			for(int y = 0; y < world.getMaxY(); y++){
 				for(int z = 0; z < world.getMaxZ(); z++){
@@ -126,7 +170,7 @@ public class Entity {
 
 
 
-						/*for(EnumDirection horDir : EnumDirection.getHorizontalDirections()){
+		/*for(EnumDirection horDir : EnumDirection.getHorizontalDirections()){
 							boolean collided = false;
 
 
@@ -174,17 +218,17 @@ public class Entity {
 								break;
 							}
 						}*/
-						/*if(aabb.getMinY() + myPos.getY() <= otherAABB.getMaxY() + otherPos.getY()){
+		/*if(aabb.getMinY() + myPos.getY() <= otherAABB.getMaxY() + otherPos.getY()){
 							collidedWithYMin = true;
 							isGrounded = true;
 							velocity.setY(0.0f);
 							transform.getPosition().setY(otherAABB.getMaxY() + otherPos.getY()
 							);
 						}*/
-					/*}
+		/*}
 				}
 			}
-			
+
 			if(!collidedWithYMin){
 				isGrounded = false;
 			}
@@ -217,7 +261,7 @@ public class Entity {
 	public AxisAlignedBB getBoundingBox(){
 		return aabb;
 	}
-	
+
 	public ClusterPosition getClusterCoords(){
 		int x = ((int)transform.getPosition().getX()) / Cluster.CLUSTER_SIZE;
 		int y = ((int)transform.getPosition().getY()) / Cluster.CLUSTER_SIZE;

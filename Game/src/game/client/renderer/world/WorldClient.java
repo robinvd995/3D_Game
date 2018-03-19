@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import caesar.util.Vector3f;
+import caesar.util.interpolate.Interpolator;
 import game.client.renderer.DebugRenderer;
 import game.client.renderer.debug.DebugTransform;
 import game.common.block.Block;
@@ -25,11 +26,22 @@ public class WorldClient extends World{
 
 	private double timeOfDay = 0;
 	private Vector3f lightDirection = new Vector3f(0.0f, 0.0f, 0.0f);
-	private Vector3f lightColor = new Vector3f(1.0f, 0.5f, 0.0f);
+	private Vector3f lightColor = new Vector3f(1.0f, 1.0f, 1.0f);
 	private float ambientStrength = 0.3f;
-
+	
+	private Interpolator<Vector3f> lightColorInterpolator = new Interpolator<Vector3f>(MAX_TIME_OF_DAY);
+	
 	public WorldClient(){
 		super();
+		//Sunrise
+		lightColorInterpolator.addInterpolation(00, new Vector3f(0.0f, 0.0f, 0.0f));
+		lightColorInterpolator.addInterpolation(05, new Vector3f(1.0f, 0.5f, 0.0f));
+		lightColorInterpolator.addInterpolation(10, new Vector3f(1.0f, 1.0f, 1.0f));
+		
+		//Sunset
+		lightColorInterpolator.addInterpolation(40, new Vector3f(1.0f, 1.0f, 1.0f));
+		lightColorInterpolator.addInterpolation(45, new Vector3f(1.0f, 0.5f, 0.0f));
+		lightColorInterpolator.addInterpolation(50, new Vector3f(0.0f, 0.0f, 0.0f));
 	}
 
 	private void createClusterRenderData(Cluster cluster){
@@ -45,7 +57,7 @@ public class WorldClient extends World{
 
 	@Override
 	public void fixedUpdate(double delta){
-		timeOfDay += delta % MAX_TIME_OF_DAY;
+		timeOfDay = (timeOfDay + delta) % MAX_TIME_OF_DAY;
 
 		float lightRotation = (float) ((timeOfDay / MAX_TIME_OF_DAY) * Math.PI * 2);
 		
@@ -55,6 +67,7 @@ public class WorldClient extends World{
 		lightRotation += (1.0f * delta) % (Math.PI * 2);
 
 		lightDirection.set(lightRotX, lightRotY, 0.0f);
+		lightColor = lightColorInterpolator.getInterpolatedValue(timeOfDay);
 	}
 
 	@Override

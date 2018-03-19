@@ -1,11 +1,14 @@
 package caesar.util;
 
-public class Vector3f extends Vector2f{
+import caesar.util.interpolate.IInterpolatable;
 
+public class Vector3f implements IInterpolatable<Vector3f>{
+
+	private float x;
+	private float y;
 	private float z;
 
 	public Vector3f(){
-		super();
 		this.z = 0;
 	}
 
@@ -14,10 +17,27 @@ public class Vector3f extends Vector2f{
 	}
 	
 	public Vector3f(float x, float y, float z) {
-		super(x, y);
+		this.x = x;
+		this.y = y;
 		this.z = z;
 	}
 
+	public float getX(){
+		return x;
+	}
+	
+	public void setX(float x){
+		this.x = x;
+	}
+	
+	public float getY(){
+		return y;
+	}
+	
+	public void setY(float y){
+		this.y = y;
+	}
+	
 	public float getZ(){
 		return z;
 	}
@@ -50,7 +70,8 @@ public class Vector3f extends Vector2f{
 	}
 
 	public Vector3f translate(float x, float y, float z){
-		super.translate(x, y);
+		this.x += x;
+		this.y += y;
 		this.z += z;
 		return this;
 	}
@@ -93,7 +114,8 @@ public class Vector3f extends Vector2f{
 	}
 
 	public Vector3f set(float x, float y, float z){
-		super.set(x, y);
+		this.x = x;
+		this.y = y;
 		this.z = z;
 		return this;
 	}
@@ -195,5 +217,13 @@ public class Vector3f extends Vector2f{
 		float y = -vec.getY();
 		float z = -vec.getZ();
 		return new Vector3f(x, y, z);
+	}
+
+	@Override
+	public Vector3f interpolate(double factor, Vector3f other) {
+		float nx = (float) (x + ((other.x - x) * factor));
+		float ny = (float) (y + ((other.y - y) * factor));
+		float nz = (float) (z + ((other.z - z) * factor));
+		return new Vector3f(nx, ny, nz);
 	}
 }

@@ -1,4 +1,4 @@
-package game.common.world.cluster;
+/*package game.common.world.cluster;
 
 import game.common.world.World;
 import game.common.world.WorldGenerator;
@@ -15,4 +15,4 @@ public class ClusterProvider {
 		WorldGenerator generator = world.getWorldGenerator();
 		return generator.generateCluster(world, pos.getPosX(), pos.getPosY(), pos.getPosZ());
 	}
-}
+}*/

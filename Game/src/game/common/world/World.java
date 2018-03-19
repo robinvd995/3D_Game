@@ -9,29 +9,24 @@ import game.common.entity.Player;
 import game.common.util.BlockPos;
 import game.common.world.cluster.Cluster;
 import game.common.world.cluster.ClusterPosition;
-import game.common.world.cluster.ClusterProvider;
 
 public class World {
 	
-	private static final int CLUSTER_LOAD_DISTANCE = 1;
+	private static final int CLUSTER_LOAD_DISTANCE = 4;
 	
 	private Player player;
 	
 	private HashMap<ClusterPosition,Cluster> clusterMap = new HashMap<ClusterPosition,Cluster>();
 	
-	private WorldGenerator generator;
-	private ClusterProvider clusterProvider;
+	private WorldProvider worldProvider;
 	
 	private ClusterPosition lastPosition;
 	
 	public World(){
-		generator = new WorldGenerator(0, 10, 5);
-		clusterProvider = new ClusterProvider(this);
+		worldProvider = new WorldProviderOverworld();
 		
-		//blocks = new Block[w][16][h];
 		player = new Player(this);
-		player.getTransform().getPosition().set(0, 0, 0);
-		//player.getTransform().setScale(1.0f, 2.0f, 1.0f);
+		player.getTransform().getPosition().set(0, 8, 0);
 		player.init();
 	}
 	
@@ -54,19 +49,11 @@ public class World {
 	 * @return the block at the given position
 	 */
 	public Block getBlock(BlockPos pos){
-		//Temp
-		/*if((pos.getX() < 0 || pos.getX() >= getMaxX() - 1) || (pos.getY() < 0 || pos.getY() >= getMaxY() - 1) || (pos.getZ() < 0 || pos.getZ() >= getMaxZ() - 1)){
-			return Block.AIR;
-		}*/
 		ClusterPosition clusterPos = new ClusterPosition(pos);
 		Cluster cluster = getCluster(clusterPos);
 		if(cluster == null) return Block.AIR;
 		//System.out.println(pos + "," + cluster.getPosition());
 		return cluster.getBlock(pos);
-	}
-	
-	public WorldGenerator getWorldGenerator(){
-		return generator;
 	}
 	
 	public Player getPlayer(){
@@ -81,10 +68,10 @@ public class World {
 		if(!player.getClusterCoords().equals(lastPosition)){
 			
 			int minX = cp.getPosX() - CLUSTER_LOAD_DISTANCE;
-			int minY = cp.getPosY() - CLUSTER_LOAD_DISTANCE;
+			int minY = Math.max(cp.getPosY() - CLUSTER_LOAD_DISTANCE, 0);
 			int minZ = cp.getPosZ() - CLUSTER_LOAD_DISTANCE;
 			int maxX = cp.getPosX() + CLUSTER_LOAD_DISTANCE;
-			int maxY = cp.getPosY() + CLUSTER_LOAD_DISTANCE;
+			int maxY = Math.min(cp.getPosY() + CLUSTER_LOAD_DISTANCE, worldProvider.getWorldHeight());
 			int maxZ = cp.getPosZ() + CLUSTER_LOAD_DISTANCE;
 			
 			List<ClusterPosition> clustersToRemove = new ArrayList<ClusterPosition>();
@@ -97,7 +84,7 @@ public class World {
 						ClusterPosition clusterPos = new ClusterPosition(i, j, k);
 						
 						if(!clusterMap.containsKey(clusterPos)){
-							Cluster cluster = clusterProvider.generateCluster(clusterPos);
+							Cluster cluster = worldProvider.getCluster(this, i, j, k);
 							clusterMap.put(clusterPos, cluster);
 							onClusterLoaded(cluster);
 						}

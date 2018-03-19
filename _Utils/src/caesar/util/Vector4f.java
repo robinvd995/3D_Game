@@ -1,11 +1,16 @@
 package caesar.util;
 
-public class Vector4f extends Vector3f{
+public class Vector4f {
 
+	private float x;
+	private float y;
+	private float z;
 	private float w;
 	
 	public Vector4f(){
-		super();
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
 		this.w = 0;
 	}
 	
@@ -22,10 +27,36 @@ public class Vector4f extends Vector3f{
 	}
 	
 	public Vector4f(float x, float y, float z, float w) {
-		super(x, y, z);
+		this.x = x;
+		this.y = y;
+		this.z = z;
 		this.w = w;
 	}
 
+	public float getX(){
+		return x;
+	}
+	
+	public void setX(float x){
+		this.x = x;
+	}
+	
+	public float getY(){
+		return y;
+	}
+	
+	public void setY(float y){
+		this.y = y;
+	}
+	
+	public float getZ(){
+		return z;
+	}
+
+	public void setZ(float z){
+		this.z = z;
+	}
+	
 	public float getW(){
 		return w;
 	}
@@ -35,7 +66,9 @@ public class Vector4f extends Vector3f{
 	}
 	
 	public void set(float x, float y, float z, float w){
-		super.set(x, y, z);
+		this.x = x;
+		this.y = y;
+		this.z = z;
 		this.w = w;
 	}
 	
@@ -47,10 +80,11 @@ public class Vector4f extends Vector3f{
 		return new Vector4f(x, y, z, w);
 	}
 	
-	public String toString(){
-		return "(" + getX() + ", " + getY() + ", " + getZ() + ", " + getW() + ")";
+	@Override
+	public String toString() {
+		return "Vector4f [x=" + x + ", y=" + y + ", z=" + z + ", w=" + w + "]";
 	}
-	
+
 	public boolean equals(Object other){
 		return other instanceof Vector4f ? equals((Vector4f) other) : false;
 	}
