@@ -27,6 +27,14 @@ public class MathHelper {
 		return matrix;
 	}
 	
+	public static Matrix4f createTransformationMatrix(Vector3f position, Quaternion quat){
+		Matrix4f matrix = new Matrix4f();
+		matrix.setIdentity();
+		Matrix4f.translate(position, matrix, matrix);
+		Matrix4f.mul(matrix, quat.toMatrix(), matrix);
+		return matrix;
+	}
+	
 	public static Matrix4f createTransformationMatrix(Vector3f position, Vector3f rot, float sx, float sy, float sz){
 		Matrix4f matrix = new Matrix4f();
 		matrix.setIdentity();

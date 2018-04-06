@@ -1,15 +1,18 @@
 package game.client.renderer.world;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import caesar.util.Vector3f;
-import caesar.util.interpolate.Interpolator;
 import game.client.renderer.DebugRenderer;
 import game.client.renderer.debug.DebugTransform;
 import game.common.block.Block;
+import game.common.entity.Entity;
+import game.common.entity.Player;
 import game.common.util.BlockPos;
 import game.common.world.World;
 import game.common.world.cluster.Cluster;
@@ -17,31 +20,23 @@ import game.common.world.cluster.ClusterPosition;
 
 public class WorldClient extends World{
 
-	private static final double MAX_TIME_OF_DAY = 100.0d;
-
 	private Queue<Cluster> clustersToAdd = new ConcurrentLinkedQueue<Cluster>();
 	private Queue<Cluster> clustersToRemove = new ConcurrentLinkedQueue<Cluster>();
 
 	private HashMap<ClusterPosition,ClusterRenderData> clusterRenderMap = new HashMap<ClusterPosition,ClusterRenderData>();
 
-	private double timeOfDay = 0;
 	private Vector3f lightDirection = new Vector3f(0.0f, 0.0f, 0.0f);
 	private Vector3f lightColor = new Vector3f(1.0f, 1.0f, 1.0f);
-	private float ambientStrength = 0.3f;
 	
-	private Interpolator<Vector3f> lightColorInterpolator = new Interpolator<Vector3f>(MAX_TIME_OF_DAY);
+	private HashMap<Class<? extends Entity>,List<Entity>> entityRenderMap = new HashMap<Class<? extends Entity>,List<Entity>>();
 	
-	public WorldClient(){
+	private ClusterPosition lastPosition;
+	
+	private Player thePlayer;
+	
+	public WorldClient(Player player){
 		super();
-		//Sunrise
-		lightColorInterpolator.addInterpolation(00, new Vector3f(0.0f, 0.0f, 0.0f));
-		lightColorInterpolator.addInterpolation(05, new Vector3f(1.0f, 0.5f, 0.0f));
-		lightColorInterpolator.addInterpolation(10, new Vector3f(1.0f, 1.0f, 1.0f));
-		
-		//Sunset
-		lightColorInterpolator.addInterpolation(40, new Vector3f(1.0f, 1.0f, 1.0f));
-		lightColorInterpolator.addInterpolation(45, new Vector3f(1.0f, 0.5f, 0.0f));
-		lightColorInterpolator.addInterpolation(50, new Vector3f(0.0f, 0.0f, 0.0f));
+		thePlayer = player;
 	}
 
 	private void createClusterRenderData(Cluster cluster){
@@ -52,22 +47,57 @@ public class WorldClient extends World{
 	@Override
 	public void update(double delta){
 		super.update(delta);
-		DebugRenderer.INSTANCE.addObjectToRender(new DebugTransform(new Vector3f(0.0f, 50.0f, 0.0f), lightDirection));
+		DebugRenderer.INSTANCE.addObjectToRender(new DebugTransform(new Vector3f(0.0f, 50.0f, 0.0f), worldProvider.getLightDirection(getTimeOfDay())));
+		
+		ClusterPosition cp = thePlayer.getClusterCoords();
+		if(!cp.equals(lastPosition)){
+			
+			int minX = cp.getPosX() - CLUSTER_LOAD_DISTANCE;
+			int minY = Math.max(cp.getPosY() - CLUSTER_LOAD_DISTANCE, 0);
+			int minZ = cp.getPosZ() - CLUSTER_LOAD_DISTANCE;
+			int maxX = cp.getPosX() + CLUSTER_LOAD_DISTANCE;
+			int maxY = Math.min(cp.getPosY() + CLUSTER_LOAD_DISTANCE, worldProvider.getWorldHeight() - 1);
+			int maxZ = cp.getPosZ() + CLUSTER_LOAD_DISTANCE;
+			
+			List<ClusterPosition> clustersToRemove = new ArrayList<ClusterPosition>();
+			clustersToRemove.addAll(clusterMap.keySet());
+			
+			for(int i = minX; i <= maxX; i++){
+				for(int j = minY; j <= maxY; j++){
+					for(int k = minZ; k <= maxZ; k++){
+						
+						ClusterPosition clusterPos = new ClusterPosition(i, j, k);
+						
+						if(!clusterMap.containsKey(clusterPos)){
+							Cluster cluster = worldProvider.getCluster(this, i, j, k);
+							clusterMap.put(clusterPos, cluster);
+							onClusterLoaded(cluster);
+						}
+						
+						clustersToRemove.remove(clusterPos);
+					}
+				}
+			}
+			
+			for(ClusterPosition clusterPos : clustersToRemove){
+				Cluster cluster = clusterMap.get(clusterPos);
+				if(cluster == null) throw new RuntimeException("Cluster map does not contain the cluster to remove, this is an bug!");
+				clusterMap.remove(clusterPos);
+				onClusterUnloaded(cluster);
+			}
+			
+			lastPosition = cp;
+			
+			onAllClustersChanged();
+		}
 	}
 
 	@Override
 	public void fixedUpdate(double delta){
-		timeOfDay = (timeOfDay + delta) % MAX_TIME_OF_DAY;
-
-		float lightRotation = (float) ((timeOfDay / MAX_TIME_OF_DAY) * Math.PI * 2);
+		super.fixedUpdate(delta);
 		
-		float lightRotX = (float) Math.cos(lightRotation);
-		float lightRotY = (float) Math.sin(lightRotation);
-
-		lightRotation += (1.0f * delta) % (Math.PI * 2);
-
-		lightDirection.set(lightRotX, lightRotY, 0.0f);
-		lightColor = lightColorInterpolator.getInterpolatedValue(timeOfDay);
+		lightDirection = worldProvider.getLightDirection(getTimeOfDay());
+		lightColor = worldProvider.getLightColor(getTimeOfDay());
 	}
 
 	@Override
@@ -121,6 +151,36 @@ public class WorldClient extends World{
 	}
 
 	public float getAmbientStrength(){
-		return ambientStrength;
+		return worldProvider.getAmbientStrenght();
+	}
+	
+	@Override
+	protected void onEntitySpawned(Entity entity){
+		Class<? extends Entity> clzz = entity.getClass();
+		if(!entityRenderMap.containsKey(clzz)){
+			entityRenderMap.put(clzz, new ArrayList<Entity>());
+		}
+		
+		List<Entity> list = entityRenderMap.get(clzz);
+		list.add(entity);
+	}
+	
+	@Override
+	protected void onEntityRemoved(Entity entity){
+		Class<? extends Entity> clzz = entity.getClass();
+		if(!entityRenderMap.containsKey(clzz)){
+			return;
+		}
+		
+		List<Entity> list = entityRenderMap.get(clzz);
+		list.remove(entity);
+	}
+	
+	public Set<Class<? extends Entity>> getEntityClassesToRender(){
+		return entityRenderMap.keySet();
+	}
+	
+	public List<Entity> getEntityInstancesForClass(Class<? extends Entity> clzz){
+		return entityRenderMap.get(clzz);
 	}
 }

@@ -6,7 +6,7 @@ import converter.api.OIMModelLoader;
 import converter.api.model.IndexedModel;
 import game.client.renderer.model.LoadedModel;
 import game.client.renderer.model.ModelLoader;
-import game.client.renderer.shader.EntityShader;
+import game.client.renderer.shader.Shader;
 import game.common.entity.Entity;
 
 public abstract class EntityRenderer {
@@ -15,6 +15,8 @@ public abstract class EntityRenderer {
 	
 	protected LoadedModel model;
 	
+	public EntityRenderer(){}
+	
 	public EntityRenderer(String modelName){
 		IndexedModel indexedModel = OIMModelLoader.loadModel(new File(MODEL_FOLDER + modelName + ".oim"));
 		if(indexedModel != null){
@@ -22,9 +24,13 @@ public abstract class EntityRenderer {
 		}
 	}
 	
-	public abstract void renderEntity(EntityShader shader, Entity entity);
+	public abstract void renderEntity(Shader shader, Entity entity, double delta);
 	
 	public void bindModel(){
 		model.bindModel();
+	}
+	
+	public boolean preloadTransformation(){
+		return true;
 	}
 }

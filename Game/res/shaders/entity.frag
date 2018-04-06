@@ -19,5 +19,5 @@ void main(void){
 	float brightness = max(nDot1, 0.3);
 	vec3 diffuse = brightness * in_block_color;
 
-	color = vec4(diffuse, 1.0);
+	color = texture(textureSampler, uvPosition) * vec4(diffuse, 1.0);
 }

@@ -1,4 +1,4 @@
-package game.common.world;
+/*package game.common.world;
 
 import java.util.Random;
 
@@ -100,4 +100,4 @@ public class NoiseGenerator {
 		float[][] smoothNoise = generatePerlinNoise(rand, whiteNoise, 1);
 		return smoothNoise;
 	}
-}
+}*/

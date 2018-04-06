@@ -11,7 +11,7 @@ import game.client.display.DisplayManager;
 public class InputManager {
 
 	private static HashMap<Key,KeyState> keyStateMap = new HashMap<Key,KeyState>();
-
+	
 	private static double lastMousePositionX;
 	private static double lastMousePositionY;
 
@@ -21,8 +21,9 @@ public class InputManager {
 	private static List<IKeyListener> keyListeners = new ArrayList<IKeyListener>();
 	private static List<IMouseListener> mouseListeners = new ArrayList<IMouseListener>();
 	private static List<ICharListener> charListeners = new ArrayList<ICharListener>();
-
-	public static void invoke(int keycode, int scancode, int action, int mods) {
+	private static List<IScrollListener> scrollListeners = new ArrayList<IScrollListener>();
+	
+	public static void invokeKey(int keycode, int scancode, int action, int mods) {
 		Key key = Key.getKey(keycode);
 		KeyState state = KeyState.getKeyState(action);
 		if(state != null){
@@ -41,6 +42,8 @@ public class InputManager {
 
 	public static void invokeMouseButton(int button, int action, int mods) {
 		//Mouse button stuff
+		
+		System.out.println(button);
 		
 		for(IMouseListener listener : mouseListeners){
 			listener.onMouseClicked(button, action, mods);
@@ -72,6 +75,13 @@ public class InputManager {
 			listener.onMouseMoved((int)mouseX, (int)mouseY);
 		}
 	}
+	
+
+	public static void invokeScroll(double xoffset, double yoffset) {
+		for(IScrollListener listener : scrollListeners){
+			listener.onScroll(xoffset, yoffset);
+		}
+	}
 
 	public static void end(){
 		mouseDeltaX = 0;
@@ -90,6 +100,10 @@ public class InputManager {
 		mouseListeners.add(listener);
 	}
 	
+	public static void addScrollListener(IScrollListener listener){
+		scrollListeners.add(listener);
+	}
+	
 	public static void removeCharListener(ICharListener listener){
 		charListeners.remove(listener);
 	}
@@ -100,6 +114,10 @@ public class InputManager {
 
 	public static void removeMouseListener(IMouseListener listener){
 		keyListeners.remove(listener);
+	}
+	
+	public static void removeScrollListener(IScrollListener listener){
+		scrollListeners.remove(listener);
 	}
 
 	public static double getMouseDeltaX(){

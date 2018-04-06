@@ -186,6 +186,8 @@ public class GuiRenderManager implements IDisplaySizeListener, IKeyListener, IMo
 		sortGuis();
 		checkForActiveGui();
 
+		gui.onGuiOpened();
+		
 		if(gui instanceof IMouseListener){
 			InputManager.addMouseListener((IMouseListener) gui);
 		}
@@ -202,7 +204,8 @@ public class GuiRenderManager implements IDisplaySizeListener, IKeyListener, IMo
 		guisToRender.remove(gui);
 		activeGui = getNextInactiveGui();
 		checkForActiveGui();
-		System.out.println(activeGui);
+		
+		gui.onGuiClosed();
 		
 		if(gui instanceof IMouseListener){
 			InputManager.removeMouseListener((IMouseListener) gui);

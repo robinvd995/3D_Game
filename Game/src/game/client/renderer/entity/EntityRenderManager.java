@@ -2,65 +2,63 @@ package game.client.renderer.entity;
 
 import java.util.HashMap;
 
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import caesar.util.Matrix4f;
 import game.client.display.DisplayManager;
-import game.client.renderer.shader.EntityShader;
+import game.client.renderer.shader.Shader;
+import game.client.renderer.shader.ShaderBuilder;
 import game.client.renderer.world.WorldClient;
 import game.common.entity.Entity;
+import game.common.entity.EntityPalmTree;
 import game.common.entity.Player;
-import game.common.world.World;
 
 public class EntityRenderManager {
 
 	private HashMap<Class<? extends Entity>,EntityRenderer> entityRendererMap = new HashMap<Class<? extends Entity>,EntityRenderer>();
 
-	private EntityShader shader;
-	//private LoadedModel model;
+	private Shader shader;
 
 	public EntityRenderManager(){
-		shader = new EntityShader();
-		/*IndexedModel indexedModel = OIMModelLoader.loadModel(new File("res/models/block.oim"));
-		model = ModelLoader.INSTANCE.loadIndexedModel(indexedModel);*/
+		shader = ShaderBuilder.buildShader("entity");
 	}
 
 	public void initRenderer(){
 		this.registerEntityRenderer(Player.class, new PlayerRenderer());
+		this.registerEntityRenderer(EntityPalmTree.class, new PalmTreeRenderer());
 	}
 
 	public void prepare(WorldClient world, Matrix4f viewMatrix) {
 		Matrix4f projectionMatrix = DisplayManager.INSTANCE.getProjectionMatrix();
 
 		shader.start();
-		shader.loadViewMatrix(viewMatrix);
-		shader.loadProjectionMatrix(projectionMatrix);
-		shader.loadLightDirection(world.getLightDirection());
+		shader.loadMatrix("viewMatrix", viewMatrix);
+		shader.loadMatrix("projectionMatrix", projectionMatrix);
+		shader.loadVector3f("lightDirection", world.getLightDirection());
 	}
 
-	public void renderEntity(WorldClient world, Entity entity){
-
-		//int vao = model.getVao();
-		//GL30.glBindVertexArray(vao);
+	public void renderEntities(WorldClient world, double delta){
 		
-		EntityRenderer entityRenderer = entityRendererMap.get(entity.getClass());
-		entityRenderer.bindModel();
-
-		GL20.glEnableVertexAttribArray(0);
-		GL20.glEnableVertexAttribArray(1);
-		GL20.glEnableVertexAttribArray(2);
-
-		Matrix4f modelMatrix = entity.getTransform().getTransformationMatrix();
-		shader.loadModelMatrix(modelMatrix);
-
-		entityRenderer.renderEntity(shader, entity);
+		for(Class<? extends Entity> clzz : world.getEntityClassesToRender()){
+			EntityRenderer renderer = entityRendererMap.get(clzz);
+			if(renderer == null)
+				throw new RuntimeException("No entity renderer found for " + clzz.toString());
+			
+			renderer.bindModel();
+			shader.enableAttribArrays();
+			
+			for(Entity entity : world.getEntityInstancesForClass(clzz)){
+				Matrix4f modelMatrix = entity.getTransform().getTransformationMatrix();
+				if(renderer.preloadTransformation())
+					shader.loadMatrix("modelMatrix", modelMatrix);
+				renderer.renderEntity(shader, entity, delta);
+			}
+			
+			shader.disableAttribArrays();
+		}
 	}
-
+	
 	public void end(){
-		GL20.glDisableVertexAttribArray(0);
-		GL20.glDisableVertexAttribArray(1);
-		GL20.glDisableVertexAttribArray(2);
 
 		GL30.glBindVertexArray(0);
 

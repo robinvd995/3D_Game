@@ -1,37 +1,23 @@
 package game.client.renderer;
 
-import caesar.util.GlobalAxis;
 import caesar.util.MathHelper;
 import caesar.util.Matrix4f;
-import game.client.Game;
-import game.client.display.DisplayManager;
-import game.client.input.InputManager;
-import game.client.input.Key;
-import game.client.input.KeyTracker;
-import game.client.renderer.gui.GuiInventory;
-import game.client.renderer.gui.GuiMenu;
-import game.client.renderer.gui.event.GuiEvent.GuiOpenEvent;
-import game.client.renderer.texture.TextureLoader;
+import caesar.util.Vector3f;
 import game.common.entity.Transform;
-import game.common.event.EventManager;
 
 public class Camera {
 
 	private Transform transform = new Transform();
-
-	private float sensitivity = 0.03f;
-	private float movementSpeed = 20.0f;
-
-	private KeyTracker leftCtrlTracker = new KeyTracker(Key.LEFT_CTRL);
-	private KeyTracker screenShotTracker = new KeyTracker(Key.F12);
-	private KeyTracker menuKeyTracker = new KeyTracker(Key.ESC);
-	private KeyTracker inventoryKeyTracker = new KeyTracker(Key.E);
+	
+	private static final float MAX_PITCH = (float) Math.toRadians(80.0);
+	
+	private float pitch = 0.0f;
 	
 	public Camera(){
-		transform.translate(0.0f, 0.0f, 10.0f);
+		//transform.translate(0.0f, 0.0f, 10.0f);
 	}
 
-	public void update(double delta) {
+	/*public void update(double delta) {
 
 		if(!Game.INSTANCE.isMouseDisabled()){
 			double rotX = Math.toRadians(InputManager.getMouseDeltaY() * sensitivity);
@@ -71,8 +57,25 @@ public class Camera {
 		if(inventoryKeyTracker.isKeyAction(1)){
 			EventManager.postPreUpdateEvent(new GuiOpenEvent(new GuiInventory()));
 		}
-	}
+	}*/
 
+	public void setPosition(Vector3f position){
+		transform.setPosition(position.getX(), position.getY(), position.getZ());
+	}
+	
+	public void setCameraYaw(float yaw){
+		transform.getRotation().setY(yaw);
+	}
+	
+	public void addCameraPitch(float d){
+		pitch = MathHelper.clampf(pitch + d, -MAX_PITCH, MAX_PITCH);
+		transform.getRotation().setX(pitch);
+	}
+	
+	public Transform getTransform(){
+		return transform;
+	}
+	
 	public Matrix4f createViewMatrix(){
 		return MathHelper.createViewMatrix(transform.getPosition(), transform.getOrientation());
 	}

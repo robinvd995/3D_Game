@@ -7,7 +7,9 @@ public enum EnumDisplaySize {
 	SIZE_1280_1024(1280, 1024),
 	SIZE_1440_900(1440, 900),
 	SIZE_1600_900(1600, 900),
-	SIZE_1920_1080(1920, 1080);
+	SIZE_1920_1080(1920, 1080),
+	SIZE_1920_1200(1920, 1200),
+	SIZE_2560_1440(2560, 1440);
 	
 	public final int displayWidth;
 	public final int displayHeight;

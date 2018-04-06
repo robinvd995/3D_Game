@@ -1,5 +1,8 @@
 package game.common.entity;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import caesar.util.Vector3f;
 import game.client.renderer.DebugRenderer;
 import game.client.renderer.debug.DebugAxisAlignedBB;
@@ -7,6 +10,7 @@ import game.client.renderer.debug.DebugRay;
 import game.common.physics.AxisAlignedBB;
 import game.common.physics.Ray;
 import game.common.util.BlockPos;
+import game.common.util.EnumDirection;
 import game.common.world.World;
 import game.common.world.cluster.Cluster;
 import game.common.world.cluster.ClusterPosition;
@@ -17,19 +21,16 @@ public class Entity {
 
 	private Vector3f lastPosition;
 
-	private boolean isGravityEnabled = false;
+	private boolean isGravityEnabled = true;
 	private boolean isGrounded = false;
-
-	private float gravity = 0.5f;
-
-	private Vector3f velocity = new Vector3f();
 
 	private AxisAlignedBB aabb;
 
 	private World world;
 
-	public Entity(World world){
-		this.world = world;
+	private float velocityY;
+	
+	public Entity(){
 		aabb = new AxisAlignedBB(-0.5f, 0.0f, -0.5f, 0.5f, 2.0f, 0.5f);
 	}
 
@@ -39,15 +40,18 @@ public class Entity {
 
 	public void update(double delta){
 		lastPosition = transform.getPosition().copy();
-		if(isGravityEnabled() && !isGrounded){
-			transform.translate(0.0f, velocity.getY() - (float)(gravity * delta), 0.0f);
-		}
 	}
 
 	public void lateUpdate(double delta){
 
-		Ray ray = new Ray(transform.getPosition(), transform.getOrientation(), 10.0f);
-		DebugRenderer.INSTANCE.addObjectToRender(new DebugRay(ray));
+		if(isGravityEnabled() && !isGrounded){
+			velocityY += -world.getGravity() * delta;
+		}
+		
+		transform.translate(0.0f, velocityY, 0.0f);
+		
+		/*Ray ray = new Ray(transform.getPosition(), transform.getOrientation(), 10.0f);
+		DebugRenderer.INSTANCE.addObjectToRender(new DebugRay(ray));*/
 
 		int minX = (int) Math.floor(transform.getPosition().getX() + aabb.getMinX());
 		int maxX = (int) Math.ceil(transform.getPosition().getX() + aabb.getMaxX());
@@ -70,7 +74,94 @@ public class Entity {
 					Vector3f otherPos = pos.toVector();
 
 					if(aabb.intersect(otherAABB, myPos, otherPos)){
-						
+
+						List<EnumDirection> possibleCollisionFaces = new LinkedList<EnumDirection>();
+
+						float myMinX = lastPosition.getX() + aabb.getMinX();
+						float myMinZ = lastPosition.getZ() + aabb.getMinZ();
+						float myMaxX = lastPosition.getX() + aabb.getMaxX();
+						float myMaxZ = lastPosition.getZ() + aabb.getMaxZ();
+
+						float myMinY = lastPosition.getY() + aabb.getMinY();
+						float myMaxY = lastPosition.getY() + aabb.getMaxY();
+
+						float otherMinX = otherPos.getX() + otherAABB.getMinX();
+						float otherMinZ = otherPos.getZ() + otherAABB.getMinZ();
+						float otherMaxX = otherPos.getX() + otherAABB.getMaxX();
+						float otherMaxZ = otherPos.getZ() + otherAABB.getMaxZ();
+
+						float otherMinY = otherPos.getY() + otherAABB.getMinY();
+						float otherMaxY = otherPos.getY() + otherAABB.getMaxY();
+
+						boolean isLeft = myMaxX > otherMinX;
+						boolean isRight = myMinX < otherMaxX;
+						boolean isBack = myMaxZ > otherMinZ;
+						boolean isFront = myMinZ < otherMaxZ;
+
+						boolean isUp = myMinY < otherMaxY;
+						boolean isDown = myMaxY > otherMinY;
+
+						if(isLeft && isBack && isFront && isUp && isDown && !isRight){
+							possibleCollisionFaces.add(EnumDirection.LEFT);
+						}
+						if(isRight && isBack && isFront && isUp && isDown && !isLeft){
+							possibleCollisionFaces.add(EnumDirection.RIGHT);
+						}
+						if(isBack && isLeft && isRight && isUp && isDown && !isFront){
+							possibleCollisionFaces.add(EnumDirection.BACK);
+						}
+						if(isFront && isLeft && isRight && isUp && isDown && !isBack){
+							possibleCollisionFaces.add(EnumDirection.FRONT);
+						}
+						if(isUp && isLeft && isRight && isFront && isBack && !isDown){
+							possibleCollisionFaces.add(EnumDirection.UP);
+						}
+						if(isDown && isLeft && isRight && isFront && isBack && !isUp){
+							possibleCollisionFaces.add(EnumDirection.DOWN);
+						}
+
+						float newPosX = 0;
+						float newPosZ = 0;
+
+						for(EnumDirection dir : possibleCollisionFaces){
+
+							switch(dir){
+							default: break;
+							case LEFT:
+								//if(myMinX >= otherMaxX){
+									newPosX = otherPos.getX() + otherAABB.getMaxX() - aabb.getMinX();
+									transform.getPosition().setX(newPosX);
+								//}
+								break;
+							case RIGHT:
+								//if(true){
+									newPosX = otherPos.getX() + otherAABB.getMinX() - aabb.getMaxX();
+									transform.getPosition().setX(newPosX);
+								//}
+								break;
+							case FRONT:
+								//if(true){
+									newPosZ = otherPos.getZ() + otherAABB.getMinZ() - aabb.getMaxZ();
+									transform.getPosition().setZ(newPosZ);
+								//}
+								break;
+							case BACK:
+								//if(myMinZ >= otherMaxZ){
+									newPosZ = otherPos.getZ() + otherAABB.getMaxZ() - aabb.getMinZ();
+									transform.getPosition().setZ(newPosZ);
+								//}
+								break;
+							case UP:
+								transform.getPosition().setY(lastPosition.getY());
+								break;
+							case DOWN:
+								transform.getPosition().setY(lastPosition.getY());
+								isGrounded = true;
+								velocityY = 0;
+								break;
+							}
+						}
+
 						/*float relX = lastPosition.getX() - pos.getX();
 						float relZ = lastPosition.getZ() - pos.getZ();
 
@@ -93,12 +184,11 @@ public class Entity {
 
 						}
 						else{
-							
+
 						}*/
-						
+
 						//transform.getPosition().set(lastPosition.getX(), lastPosition.getY(), lastPosition.getZ());
 					}
-					
 				}
 			}
 		}
@@ -239,9 +329,13 @@ public class Entity {
 		DebugRenderer.INSTANCE.addObjectToRender(new DebugPosition(transform.getPosition()));*/
 	}
 
+	public void onEntitySpawned(World world){
+		this.world = world;
+	}
+	
 	public void jump(float jumpStrength){
 		if(isGrounded){
-			transform.getPosition().add(0.0f, jumpStrength, 0.0f);
+			velocityY = jumpStrength;
 			isGrounded = false;
 		}
 	}

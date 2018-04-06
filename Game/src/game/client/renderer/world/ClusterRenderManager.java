@@ -51,47 +51,53 @@ public class ClusterRenderManager {
 		TextureManager.bindBlockNormalMap();
 	}
 
-	public void renderBlocks(WorldClient world){
+	public void renderBlocks(WorldClient world, int pass){
 
-		for(ClusterPosition pos : world.getClusterRenderPositions()){
+		switch(pass){
+		case 0:
+			for(ClusterPosition pos : world.getClusterRenderPositions()){
 
-			Matrix4f modelMatrix = MathHelper.createTransformationMatrix(pos.getWorldCoords(0, 0, 0).toVector(), 1.0F, 1.0F, 1.0F, Quaternion.fromVector(new Vector3f()));
+				Matrix4f modelMatrix = MathHelper.createTransformationMatrix(pos.getWorldCoords(0, 0, 0).toVector(), 1.0F, 1.0F, 1.0F, Quaternion.fromVector(new Vector3f()));
 
-			ClusterRenderData crd = world.getClusterRenderData(pos);
-			StreamModel model = crd.getModel();
+				ClusterRenderData crd = world.getClusterRenderData(pos);
+				StreamModel model = crd.getModel();
 
-			model.bindModel();
-			shader.enableAttribArrays();
-			shader.loadMatrix("modelMatrix", modelMatrix);
+				model.bindModel();
+				shader.enableAttribArrays();
+				shader.loadMatrix("modelMatrix", modelMatrix);
 
-			GL11.glDrawElements(GL11.GL_TRIANGLES, model.getSize(), GL11.GL_UNSIGNED_INT, 0);
+				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getSize(), GL11.GL_UNSIGNED_INT, 0);
 
-			shader.disableAttribArrays();
-			model.unbindModel();
+				shader.disableAttribArrays();
+				model.unbindModel();
+			}
+			break;
+		case 1:
+			GLHelper.enableAlphaBlending();
+			
+			for(ClusterPosition pos : world.getClusterRenderPositions()){
+
+				Matrix4f modelMatrix = MathHelper.createTransformationMatrix(pos.getWorldCoords(0, 0, 0).toVector(), 1.0F, 1.0F, 1.0F, Quaternion.fromVector(new Vector3f()));
+
+				ClusterRenderData crd = world.getClusterRenderData(pos);
+				StreamModel model = crd.getTransparentModel();
+
+				model.bindModel();
+				shader.enableAttribArrays();
+				shader.loadMatrix("modelMatrix", modelMatrix);
+
+				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getSize(), GL11.GL_UNSIGNED_INT, 0);
+
+				shader.disableAttribArrays();
+				model.unbindModel();
+			}
+			
+			GLHelper.disableBlending();
+			break;
 		}
 
 		//GL11.glEnable(GL11.GL_BLEND);
 		//GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GLHelper.enableAlphaBlending();
-		
-		for(ClusterPosition pos : world.getClusterRenderPositions()){
-
-			Matrix4f modelMatrix = MathHelper.createTransformationMatrix(pos.getWorldCoords(0, 0, 0).toVector(), 1.0F, 1.0F, 1.0F, Quaternion.fromVector(new Vector3f()));
-
-			ClusterRenderData crd = world.getClusterRenderData(pos);
-			StreamModel model = crd.getTransparentModel();
-
-			model.bindModel();
-			shader.enableAttribArrays();
-			shader.loadMatrix("modelMatrix", modelMatrix);
-
-			GL11.glDrawElements(GL11.GL_TRIANGLES, model.getSize(), GL11.GL_UNSIGNED_INT, 0);
-
-			shader.disableAttribArrays();
-			model.unbindModel();
-		}
-		
-		GLHelper.disableBlending();
 	}
 
 	public void end(){

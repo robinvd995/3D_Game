@@ -11,7 +11,7 @@ public class GuiFrameBuffer extends FrameBuffer{
 	
 	private GuiFrameBuffer(int buffer, int width, int height) {
 		super(buffer, width, height);
-		this.colorTexture = createColorTexture();
+		this.colorTexture = this.createTextureAttachment();
 		this.unbindBuffer();
 	}
 	

@@ -34,7 +34,7 @@ public abstract class WorldProvider {
 			return null;
 		}
 		
-		String filePath = "world/" + getWorldName() + "/data_" + clusterX + "_" + clusterY + "_" + clusterZ + ".bin";
+		String filePath = "world/" + getWorldName() + "/cluster/data_" + clusterX + "_" + clusterY + "_" + clusterZ + ".bin";
 		File file = new File(filePath);
 		if(!file.exists()){
 			ClusterColumn column = generateClusterColumn(world, clusterX, clusterZ);
@@ -71,7 +71,6 @@ public abstract class WorldProvider {
 			int y = (i / (cSize)) % cSize;
 			int z = i % cSize;
 			int block = byteArray[i];
-			System.out.println(x + "," + y + "," + z + "," +block);
 			cluster.setBlock(Block.getBlockFromId(block), x, y, z);
 		}
 		fileIn.close();
@@ -79,7 +78,7 @@ public abstract class WorldProvider {
 	}
 	
 	private void writeClusterToFile(Cluster cluster) throws IOException{
-		String clusterFilePath = "world/" + getWorldName() + "/data_" + cluster.getPosition().getPosX() + "_" + cluster.getPosition().getPosY() + "_" + cluster.getPosition().getPosZ() + ".bin";
+		String clusterFilePath = "world/" + getWorldName() + "/cluster/data_" + cluster.getPosition().getPosX() + "_" + cluster.getPosition().getPosY() + "_" + cluster.getPosition().getPosZ() + ".bin";
 		File clusterFile = new File(clusterFilePath);
 		if(!clusterFile.exists()){
 			clusterFile.createNewFile();
@@ -92,4 +91,8 @@ public abstract class WorldProvider {
 	}
 	
 	protected abstract ClusterColumn generateClusterColumn(World world, int clusterX, int clusterZ);
+	
+	public float getGravity() {
+		return 0.25f;
+	}
 }

@@ -6,9 +6,15 @@ public class Interpolator<T extends IInterpolatable<T>> {
 
 	private final double maxTime;
 	private final LinkedList<InterpolatorEntry<T>> interpolationList;
+	private final IInterpolateFunction function;
 	
 	public Interpolator(double maxTime){
+		this(maxTime, InterpolateFunctions.FUNCTION_LINEAR);
+	}
+	
+	public Interpolator(double maxTime, IInterpolateFunction function){
 		this.maxTime = maxTime;
+		this.function = function;
 		this.interpolationList = new LinkedList<InterpolatorEntry<T>>();
 	}
 	
@@ -37,6 +43,10 @@ public class Interpolator<T extends IInterpolatable<T>> {
 	
 	public T getInterpolatedValue(double time){
 		
+		if(interpolationList.size() == 0){
+			return null;
+		}
+		
 		if(interpolationList.size() == 1)
 			return interpolationList.get(0).object;
 		
@@ -54,7 +64,7 @@ public class Interpolator<T extends IInterpolatable<T>> {
 			endTime += maxTime;
 		}
 		
-		double interpolationFactor = (time - startTime) / (endTime - startTime);
+		double interpolationFactor = function.getFactor(time, startTime, endTime);//(time - startTime) / (endTime - startTime);
 		T interpolatable = currentEntry.object;
 		return interpolatable.interpolate(interpolationFactor, nextEntry.object);
 	}
@@ -81,6 +91,10 @@ public class Interpolator<T extends IInterpolatable<T>> {
 		}
 		return size - 1;
 		//throw new RuntimeException("Could not find current index");
+	}
+	
+	public int getSize(){
+		return interpolationList.size();
 	}
 	
 	private static class InterpolatorEntry<T extends IInterpolatable<T>> {

@@ -11,7 +11,7 @@ public class TextureFrameBuffer extends FrameBuffer{
 	
 	private TextureFrameBuffer(int buffer) {
 		super(buffer, TextureStitcher.TEXTURE_DIMENSIONS, TextureStitcher.TEXTURE_DIMENSIONS);
-		this.colorTexture = createColorTexture();
+		this.colorTexture = this.createTextureAttachment();
 		this.unbindBuffer();
 	}
 	

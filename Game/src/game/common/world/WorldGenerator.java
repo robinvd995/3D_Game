@@ -1,4 +1,4 @@
-package game.common.world;
+/*package game.common.world;
 
 import java.util.Random;
 
@@ -54,7 +54,7 @@ public class WorldGenerator {
 		}
 		
 		return cluster;
-	}
+	}*/
 	
 	/*public World generateWorld(int width, int height, int minHeight, int maxHeight, int waterLevel){
 		Random rand = new Random();
@@ -108,4 +108,4 @@ public class WorldGenerator {
 
 		return world;
 	}*/
-}
+//}

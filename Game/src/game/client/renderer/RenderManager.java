@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.GL;
 
 import caesar.util.Matrix4f;
+import game.client.renderer.block.water.WaterRenderer;
 //import game.client.renderer.block.BlockRenderManager;
 import game.client.renderer.entity.EntityRenderManager;
 import game.client.renderer.gui.GuiRenderManager;
@@ -21,6 +22,7 @@ public class RenderManager {
 	private EntityRenderManager entityRenderer;
 	private GuiRenderManager guiRenderer;
 	private SkyRenderManager skyboxRenderer;
+	public static WaterRenderer waterRenderer;
 	
 	public RenderManager(){
 		//blockRenderer = new BlockRenderManager();
@@ -28,6 +30,7 @@ public class RenderManager {
 		entityRenderer = new EntityRenderManager();
 		guiRenderer = new GuiRenderManager();
 		skyboxRenderer = new SkyRenderManager();
+		waterRenderer = new WaterRenderer();
 		DebugRenderer.INSTANCE.init();
 	}
 
@@ -38,6 +41,7 @@ public class RenderManager {
 	public void initRenderer(){
 		//BlockRenderRegistry.loadAllRenderData();
 		RenderRegistry.registerBlockRenderers();
+		RenderRegistry.registerItemRenderers();
 		RenderRegistry.loadBlockRenderData();
 		TextureManager.loadBlockTextures();
 		
@@ -46,6 +50,7 @@ public class RenderManager {
 		//blockRenderer.initRenderer();
 		guiRenderer.initRenderer();
 		skyboxRenderer.initRenderer();
+		waterRenderer.initRenderer();
 	}
 	
 	public void preRender(){
@@ -61,19 +66,20 @@ public class RenderManager {
 		skyboxRenderer.renderSkybox(viewMatrix);
 		skyboxRenderer.renderSun(world, viewMatrix);
 		
+		//waterRenderer.getBuffer().bindBuffer();
+		//GLHelper.clear();
 		clusterRenderer.prepare(world, viewMatrix);
-		clusterRenderer.renderBlocks(world);
+		clusterRenderer.renderBlocks(world, 0);
 		clusterRenderer.end();
-		
-		/*blockRenderer.prepare(lightDir, viewMatrix);
-		blockRenderer.renderBlocks(world, false);
-		
-		blockRenderer.renderBlocks(world, true);
-		blockRenderer.end();*/
+		//waterRenderer.getBuffer().unbindBuffer();
 		
 		entityRenderer.prepare(world, viewMatrix);
-		entityRenderer.renderEntity(world, world.getPlayer());
+		entityRenderer.renderEntities(world, delta);
 		entityRenderer.end();
+		
+		clusterRenderer.prepare(world, viewMatrix);
+		clusterRenderer.renderBlocks(world, 1);
+		clusterRenderer.end();
 		
 		DebugRenderer.INSTANCE.prepare(viewMatrix);
 		DebugRenderer.INSTANCE.renderAll();

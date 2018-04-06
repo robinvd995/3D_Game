@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import caesar.util.interpolate.IInterpolatable;
+import caesar.util.interpolate.InterpolateFunctions;
 import caesar.util.interpolate.Interpolator;
 
 public class InterpolatorTest {
@@ -22,11 +23,11 @@ public class InterpolatorTest {
 		int index3 = interpolator.calcCurrentIndex(3.5f);
 		int index4 = interpolator.calcCurrentIndex(4.5f);
 		
-		System.out.println("Index0 = " + index0);
-		System.out.println("Index1 = " + index1);
-		System.out.println("Index2 = " + index2);
-		System.out.println("Index3 = " + index3);
-		System.out.println("Index4 = " + index4);
+		//System.out.println("Index0 = " + index0);
+		//System.out.println("Index1 = " + index1);
+		//System.out.println("Index2 = " + index2);
+		//System.out.println("Index3 = " + index3);
+		//System.out.println("Index4 = " + index4);
 		
 		Assert.assertEquals(3, index0);
 		Assert.assertEquals(0, index1);
@@ -44,11 +45,23 @@ public class InterpolatorTest {
 		float value0 = interpolator.getInterpolatedValue(0.5f).value;
 		float value1 = interpolator.getInterpolatedValue(1.25f).value;
 		
-		System.out.println("value0 = " + value0);
-		System.out.println("value1 = " + value1);
+		//System.out.println("value0 = " + value0);
+		//System.out.println("value1 = " + value1);
 		
 		Assert.assertEquals(0.5f, value0, 0.01f);
 		Assert.assertEquals(0.75f, value1, 0.01f);
+	}
+	
+	@Test
+	public void interpolatorSmoothstepTest(){
+		Interpolator<FloatWrapper> interpolator = new Interpolator<FloatWrapper>(2.0f, InterpolateFunctions.FUNCTION_SMOOTHSTEP);
+		interpolator.addInterpolation(0.0f, new FloatWrapper(0.0f));
+		interpolator.addInterpolation(1.0f, new FloatWrapper(1.0f));
+		System.out.println(interpolator.getInterpolatedValue(0.1f));
+		System.out.println(interpolator.getInterpolatedValue(0.3f));
+		System.out.println(interpolator.getInterpolatedValue(0.5f));
+		System.out.println(interpolator.getInterpolatedValue(0.7f));
+		System.out.println(interpolator.getInterpolatedValue(0.9f));
 	}
 	
 	private static class FloatWrapper implements IInterpolatable<FloatWrapper> {
@@ -61,7 +74,7 @@ public class InterpolatorTest {
 		
 		@Override
 		public FloatWrapper interpolate(double factor, FloatWrapper other) {
-			System.out.println("Factor:" + factor);
+			//System.out.println("Factor:" + factor);
 			float delta = other.value - value;
 			return new FloatWrapper((float) (value + (factor * delta)));
 		}

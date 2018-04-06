@@ -169,6 +169,8 @@ public abstract class Gui {
 		return createQuad(x, y, width, height, u, v, texture, guiWidth, guiHeight);
 	}
 
+	
+	
 	public SimpleModel createQuad(int x, int y, int width, int height, int u, int v, TextureData texture, int sourceWidth, int sourceHeight){
 		float x0 = (float)x / (float)(/*screenWidth*/sourceWidth * 0.5f);
 		float y0 = -((float)y / (float)(/*screenHeight*/sourceHeight * 0.5f));
@@ -178,6 +180,38 @@ public abstract class Gui {
 		float v0 = (float)v / (float)texture.getHeight();
 		float u1 = (float)(u + width) / (float)texture.getWidth();
 		float v1 = (float)(v + height) / (float)texture.getHeight();
+
+		float[] vertices = {
+				x0, y0,
+				x1, y0,
+				x1, y1,
+				x0, y1,
+		};
+
+		float[] uvs = {
+				u0, v0,
+				u1, v0,
+				u1, v1,
+				u0, v1
+		};
+
+		int[] indices = {
+				0,1,2,
+				2,3,0
+		};
+
+		return ModelLoader.INSTANCE.load2DIndexedSimpleModel(vertices, uvs, indices);
+	}
+	
+	public SimpleModel createQuad(int x, int y, int width, int height, int u, int v, int textureWidth, int textureHeight, int sourceWidth, int sourceHeight){
+		float x0 = (float)x / (float)(/*screenWidth*/sourceWidth * 0.5f);
+		float y0 = -((float)y / (float)(/*screenHeight*/sourceHeight * 0.5f));
+		float x1 = (float)(x + width) / (float)(/*screenWidth*/sourceWidth * 0.5f);
+		float y1 = -((float)(y + height) / (float)(/*screenHeight*/sourceHeight * 0.5f));
+		float u0 = (float)u / (float)textureWidth;
+		float v0 = (float)v / (float)textureHeight;
+		float u1 = (float)(u + width) / (float)textureWidth;
+		float v1 = (float)(v + height) / (float)textureHeight;
 
 		float[] vertices = {
 				x0, y0,
@@ -527,4 +561,8 @@ public abstract class Gui {
 	public void playSound(String sound){
 		audioSource.playSound(sound);
 	}
+	
+	public void onGuiOpened() {}
+	
+	public void onGuiClosed() {}
 }

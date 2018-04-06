@@ -57,6 +57,10 @@ public class Transform {
 		scale.set(sx, sy, sz);
 	}
 	
+	public void setPosition(float x, float y, float z){
+		position.set(x, y, z);
+	}
+	
 	public Matrix4f getTransformationMatrix(){
 		return MathHelper.createTransformationMatrix(position, scale, getOrientation());
 	}

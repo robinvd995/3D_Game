@@ -32,6 +32,7 @@ public class BlockWater extends Block {
 	
 	@Override
 	public boolean shouldRenderSide(World world, BlockPos pos, EnumDirection side){
+		if(side != EnumDirection.UP) return false;
 		Block block = world.getBlock(pos.move(side));
 		return !block.isFullCube() && block != Block.WATER;
 	}

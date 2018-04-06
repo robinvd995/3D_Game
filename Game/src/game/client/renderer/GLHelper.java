@@ -12,4 +12,8 @@ public class GLHelper {
 	public static void disableBlending(){
 		GL11.glDisable(GL11.GL_BLEND);
 	}
+	
+	public static void clear(){
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+	}
 }

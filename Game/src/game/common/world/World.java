@@ -2,9 +2,12 @@ package game.common.world;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import game.common.block.Block;
+import game.common.entity.Entity;
 import game.common.entity.Player;
 import game.common.util.BlockPos;
 import game.common.world.cluster.Cluster;
@@ -12,22 +15,26 @@ import game.common.world.cluster.ClusterPosition;
 
 public class World {
 	
-	private static final int CLUSTER_LOAD_DISTANCE = 4;
+	public static final int CLUSTER_LOAD_DISTANCE = 4;
 	
-	private Player player;
+	//private Player player;
 	
-	private HashMap<ClusterPosition,Cluster> clusterMap = new HashMap<ClusterPosition,Cluster>();
+	protected HashMap<ClusterPosition,Cluster> clusterMap = new HashMap<ClusterPosition,Cluster>();
 	
-	private WorldProvider worldProvider;
+	protected WorldProvider worldProvider;
 	
-	private ClusterPosition lastPosition;
+	private List<Entity> entities = new ArrayList<Entity>();
+	private Queue<Entity> entitiesToRemove = new LinkedList<Entity>();
+	
+	private double timeOfDay;
 	
 	public World(){
 		worldProvider = new WorldProviderOverworld();
-		
-		player = new Player(this);
-		player.getTransform().getPosition().set(0, 8, 0);
-		player.init();
+		timeOfDay = worldProvider.getDayLength() / 8;
+	}
+	
+	public void init(){
+		//spawnEntity(player);
 	}
 	
 	/**
@@ -56,63 +63,42 @@ public class World {
 		return cluster.getBlock(pos);
 	}
 	
-	public Player getPlayer(){
-		return player;
-	}
-	
 	public void update(double delta){
-		player.update(delta);
-		player.lateUpdate(delta);
+		//player.update(delta);
+		//player.lateUpdate(delta);
 		
-		ClusterPosition cp = player.getClusterCoords();
-		if(!player.getClusterCoords().equals(lastPosition)){
-			
-			int minX = cp.getPosX() - CLUSTER_LOAD_DISTANCE;
-			int minY = Math.max(cp.getPosY() - CLUSTER_LOAD_DISTANCE, 0);
-			int minZ = cp.getPosZ() - CLUSTER_LOAD_DISTANCE;
-			int maxX = cp.getPosX() + CLUSTER_LOAD_DISTANCE;
-			int maxY = Math.min(cp.getPosY() + CLUSTER_LOAD_DISTANCE, worldProvider.getWorldHeight());
-			int maxZ = cp.getPosZ() + CLUSTER_LOAD_DISTANCE;
-			
-			List<ClusterPosition> clustersToRemove = new ArrayList<ClusterPosition>();
-			clustersToRemove.addAll(clusterMap.keySet());
-			
-			for(int i = minX; i <= maxX; i++){
-				for(int j = minY; j <= maxY; j++){
-					for(int k = minZ; k <= maxZ; k++){
-						
-						ClusterPosition clusterPos = new ClusterPosition(i, j, k);
-						
-						if(!clusterMap.containsKey(clusterPos)){
-							Cluster cluster = worldProvider.getCluster(this, i, j, k);
-							clusterMap.put(clusterPos, cluster);
-							onClusterLoaded(cluster);
-						}
-						
-						clustersToRemove.remove(clusterPos);
-					}
-				}
-			}
-			
-			for(ClusterPosition clusterPos : clustersToRemove){
-				Cluster cluster = clusterMap.get(clusterPos);
-				if(cluster == null) throw new RuntimeException("Cluster map does not contain the cluster to remove, this is an bug!");
-				clusterMap.remove(clusterPos);
-				onClusterUnloaded(cluster);
-			}
-			
-			lastPosition = cp;
-			
-			onAllClustersChanged();
+		for(Entity entity : entities){
+			entity.update(delta);
+		}
+		
+		for(Entity entity : entities){
+			entity.lateUpdate(delta);
+		}
+		
+		while(!entitiesToRemove.isEmpty()){
+			Entity entity = entitiesToRemove.poll();
+			entities.remove(entity);
+			onEntityRemoved(entity);
 		}
 	}
 	
 	public void fixedUpdate(double delta){
-		
+		timeOfDay = (timeOfDay + delta) % worldProvider.getDayLength();
 	}
 	
 	private Cluster getCluster(ClusterPosition pos){
 		return clusterMap.get(pos);
+	}
+	
+	
+	public void spawnEntity(Entity entity){
+		entities.add(entity);
+		entity.onEntitySpawned(this);
+		onEntitySpawned(entity);
+	}
+	
+	public void removeEntity(Entity entity){
+		entitiesToRemove.add(entity);
 	}
 	
 	protected void onClusterLoaded(Cluster cluster) {}
@@ -121,5 +107,17 @@ public class World {
 	
 	protected void onBlockChanged(Block block, BlockPos pos) {}
 	
-	protected void onAllClustersChanged(){}
+	protected void onAllClustersChanged() {}
+	
+	protected void onEntitySpawned(Entity entity) {}
+	
+	protected void onEntityRemoved(Entity entity) {}
+	
+	public double getTimeOfDay(){
+		return timeOfDay;
+	}
+
+	public float getGravity() {
+		return worldProvider.getGravity();
+	}
 }
