@@ -1,0 +1,5 @@
+{
+	"version":"400 core",
+	"vertex":"shaders/vertex/skybox",
+	"fragment":"shaders/fragment/skybox"
+}

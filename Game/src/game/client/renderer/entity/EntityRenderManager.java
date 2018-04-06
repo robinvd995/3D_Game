@@ -20,7 +20,7 @@ public class EntityRenderManager {
 	private Shader shader;
 
 	public EntityRenderManager(){
-		shader = ShaderBuilder.buildShader("entity");
+		shader = ShaderBuilder.newInstance("entity").buildShader();
 	}
 
 	public void initRenderer(){

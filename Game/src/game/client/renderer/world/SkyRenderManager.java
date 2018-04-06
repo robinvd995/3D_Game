@@ -3,9 +3,7 @@ package game.client.renderer.world;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
-import caesar.util.MathHelper;
 import caesar.util.Matrix4f;
-import caesar.util.Quaternion;
 import caesar.util.Vector3f;
 import game.client.display.DisplayManager;
 import game.client.geometry.GeometryBuilder;
@@ -42,8 +40,8 @@ public class SkyRenderManager {
 	}
 
 	public void initRenderer(){
-		skyboxShader = ShaderBuilder.buildShader("skybox");
-		sunShader = ShaderBuilder.buildShader("sun");
+		skyboxShader = ShaderBuilder.newInstance("skybox").buildShader();
+		sunShader = ShaderBuilder.newInstance("sun").buildShader();
 	}
 
 	public void renderSun(WorldClient world, Matrix4f viewMatrix){

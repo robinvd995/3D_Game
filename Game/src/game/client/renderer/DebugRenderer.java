@@ -27,7 +27,7 @@ public class DebugRenderer {
 	private DebugRenderer(){}
 	
 	protected void init(){
-		shader = ShaderBuilder.buildShader("line");
+		shader = ShaderBuilder.newInstance("line").buildShader();
 		model = ModelLoader.INSTANCE.createStreamModel();
 		model.bindModel();
 		model.createIndexBuffer(24);

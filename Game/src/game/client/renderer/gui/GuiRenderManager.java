@@ -23,6 +23,7 @@ import game.client.renderer.gui.font.FontManager;
 import game.client.renderer.model.SimpleModel;
 import game.client.renderer.shader.Shader;
 import game.client.renderer.shader.ShaderBuilder;
+import game.client.renderer.shader.ShaderBuilderOld;
 import game.common.event.EventManager;
 
 public class GuiRenderManager implements IDisplaySizeListener, IKeyListener, IMouseListener, ICharListener{
@@ -41,7 +42,7 @@ public class GuiRenderManager implements IDisplaySizeListener, IKeyListener, IMo
 	}
 
 	public void initRenderer() {
-		shader = ShaderBuilder.buildShader("gui");
+		shader = ShaderBuilder.newInstance("gui").buildShader();
 		DisplayManager.INSTANCE.addDisplaySizeListener(this);
 		FontManager.loadFont("arial");
 
