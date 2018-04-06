@@ -13,7 +13,6 @@ import game.client.renderer.GLHelper;
 import game.client.renderer.model.StreamModel;
 import game.client.renderer.shader.Shader;
 import game.client.renderer.shader.ShaderBuilder;
-import game.client.renderer.shader.ShaderBuilderOld;
 import game.client.renderer.texture.TextureManager;
 import game.common.world.cluster.ClusterPosition;
 

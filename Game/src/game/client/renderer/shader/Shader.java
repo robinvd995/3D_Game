@@ -63,13 +63,13 @@ public class Shader {
 	protected void bindAttribute(int attributeNumber, String name){
 		GL20.glBindAttribLocation(shaderId, attributeNumber, name);
 		attributes.add(attributeNumber);
-		System.out.println("Bind attribute: " + name + " in slot " + attributeNumber);
+		//System.out.println("Bind attribute: " + name + " in slot " + attributeNumber);
 	}
 	
 	protected void bindUniformLocation(String uniformName){
 		int uniformLocation = GL20.glGetUniformLocation(shaderId, uniformName);
 		uniformMap.put(uniformName, uniformLocation);
-		System.out.println("Loading uniform " + uniformName);
+		//System.out.println("Loading uniform " + uniformName);
 	}
 	
 	public void loadInt(String uniform, int value){

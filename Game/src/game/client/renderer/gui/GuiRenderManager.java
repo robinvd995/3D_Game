@@ -23,7 +23,6 @@ import game.client.renderer.gui.font.FontManager;
 import game.client.renderer.model.SimpleModel;
 import game.client.renderer.shader.Shader;
 import game.client.renderer.shader.ShaderBuilder;
-import game.client.renderer.shader.ShaderBuilderOld;
 import game.common.event.EventManager;
 
 public class GuiRenderManager implements IDisplaySizeListener, IKeyListener, IMouseListener, ICharListener{

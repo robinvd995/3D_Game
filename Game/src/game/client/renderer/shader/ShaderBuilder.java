@@ -31,9 +31,6 @@ public class ShaderBuilder {
 		LinkedList<String> vertexSource = loadShaderSource(vertexFile);
 		LinkedList<String> fragmentSource = loadShaderSource(fragmentFile);
 		
-		System.out.println(vertexSource);
-		System.out.println(fragmentSource);
-		
 		int vertShaderId = processVertexSource(vertexSource);
 		int fragShaderId = processFragmentSource(fragmentSource);
 		
@@ -78,7 +75,6 @@ public class ShaderBuilder {
 		StringBuilder builder = new StringBuilder();
 		for(String line : source){
 			scanForUniformVariables(line);
-			//scanForAttributeVariables(line);
 			builder.append(line).append("\n");
 		}
 		return compileShader(GL20.GL_FRAGMENT_SHADER, builder);
